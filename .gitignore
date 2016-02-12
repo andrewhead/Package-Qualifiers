@@ -1,3 +1,4 @@
+## NODE
 # Logs
 logs
 *.log
@@ -31,3 +32,7 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+## PYTHON
+# Virtual environments
+venv
