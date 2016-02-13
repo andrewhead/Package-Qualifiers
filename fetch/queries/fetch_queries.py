@@ -110,9 +110,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '--db', help="which type of database to use (postgres, sqlite)." +
         "Defaults to sqlite.")
-    parser.add_argument('--db-creds', help="Name of file containing database credentials.")
+    parser.add_argument('--db-config', help="Name of file containing database configuration.")
     args = parser.parse_args()
 
-    init_database(args.db, creds_filename=args.db_creds)
+    init_database(args.db, config_filename=args.db_config)
     create_tables()
     get_results_for_text(args.query)
