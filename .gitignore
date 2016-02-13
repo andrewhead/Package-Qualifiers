@@ -42,3 +42,8 @@ venv
 
 # Compiled files
 *.pyc
+
+## DEVELOPMENT
+## Text editing
+.*.swp
+.*.swo
