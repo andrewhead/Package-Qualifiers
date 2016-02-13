@@ -2,7 +2,7 @@ appname: fetcher
 projectdir: /home/{{ ansible_user }}/drive
 repo: https://github.com/andrewhead/Package-Qualifiers.git
 privatebucket: readme-fetcher
-postgres_creds: postgres-credentials.json
+postgres_config: postgres-config.json
 logfile: /var/log/{{ appname }}.log
 postgres_port: 5432
 postgres_version: 9.3

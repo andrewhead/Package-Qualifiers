@@ -28,6 +28,6 @@
   git: repo={{ repo }} dest={{ src }} force=yes recursive=yes
   tags: updatecode
 
-- name: Fetch PostgreSQL credentials
-  s3: bucket={{ privatebucket }} object={{ postgres_creds }} dest={{ src }}/{{ postgres_creds }} mode=get
+- name: Fetch PostgreSQL configuration
+  s3: bucket={{ privatebucket }} object={{ postgres_config }} dest={{ src }}/{{ postgres_config }} mode=get
       aws_access_key={{ aws_access_key_id }} aws_secret_key={{ aws_secret_access_key }}
