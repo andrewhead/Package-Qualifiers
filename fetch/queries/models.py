@@ -4,12 +4,16 @@
 from __future__ import unicode_literals
 import logging
 import datetime
-from peewee import Model, SqliteDatabase,\
+import json
+from peewee import Model, SqliteDatabase, Proxy, PostgresqlDatabase, \
     CharField, IntegerField, ForeignKeyField, DateTimeField
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-db = SqliteDatabase('queries.db')
+
+POSTGRES_CONFIG_NAME = 'postgres-credentials.json'
+DATABASE_NAME = 'fetcher'
+db_proxy = Proxy()
 
 
 class Seed(Model):
@@ -25,7 +29,7 @@ class Seed(Model):
     depth = IntegerField()
 
     class Meta:
-        database = db
+        database = db_proxy
 
 
 class Query(Model):
@@ -42,8 +46,32 @@ class Query(Model):
     rank = IntegerField()
 
     class Meta:
-        database = db
+        database = db_proxy
+
+
+def init_database(db_type=None, creds_filename=None):
+
+    if db_type == 'postgres':
+
+        # If the user wants to use Postgres, they should define their credentials
+        # in an external config file, which are used here to access the database.
+        creds_filename = creds_filename if creds_filename else POSTGRES_CONFIG_NAME
+        with open(creds_filename) as pg_config_file:
+            pg_config = json.load(pg_config_file)
+
+        creds = {}
+        creds['user'] = pg_config['dbusername']
+        if 'dbpassword' in pg_config:
+            creds['password'] = pg_config['dbpassword']
+
+        db = PostgresqlDatabase(DATABASE_NAME, **creds)
+
+    # Sqlite is the default type of database.
+    elif db_type == 'sqlite' or not db_type:
+        db = SqliteDatabase(DATABASE_NAME + '.db')
+
+    db_proxy.initialize(db)
 
 
 def create_tables():
-    db.create_tables([Query, Seed], safe=True)
+    db_proxy.create_tables([Query, Seed], safe=True)

@@ -47,3 +47,6 @@ venv
 ## Text editing
 .*.swp
 .*.swo
+
+## Credentials files
+*-credentials.json

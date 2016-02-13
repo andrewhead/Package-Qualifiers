@@ -7,8 +7,9 @@ from xml.etree import ElementTree
 
 from peewee import fn
 from api import make_request, default_requests_session
-from models import Query, Seed, create_tables
+from models import Query, Seed, create_tables, init_database
 import time
+import argparse
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -103,5 +104,15 @@ def get_results(seed):
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description="fetch autocomplete queries for a see query.")
+    parser.add_argument('query', help="the query with which to see autocomplete")
+    parser.add_argument(
+        '--db', help="which type of database to use (postgres, sqlite)." +
+        "Defaults to sqlite.")
+    parser.add_argument('--db-creds', help="Name of file containing database credentials.")
+    args = parser.parse_args()
+
+    init_database(args.db, creds_filename=args.db_creds)
     create_tables()
-    get_results_for_text('d3')
+    get_results_for_text(args.query)
