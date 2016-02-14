@@ -6,3 +6,5 @@ postgres_config: postgres-config.json
 logfile: /var/log/{{ appname }}.log
 postgres_port: 5432
 postgres_version: 9.3
+venv: "{{ projectdir }}/venv"
+src: "{{ projectdir }}/src"

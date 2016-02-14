@@ -1,0 +1,10 @@
+---
+- name: Launch query-fetching job
+  command: >
+    {{ projectdir }}/venv/bin/python
+    {{ src }}/fetch/queries/fetch_queries.py
+    d3
+    --db postgres
+    --db-config {{ src }}/{{ postgres_config }}
+  async: 60  # arbitrary value.  The 'async' key is needed for asynchronous execution.
+  poll: 0
