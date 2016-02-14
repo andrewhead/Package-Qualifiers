@@ -10,6 +10,7 @@ from api import make_request, default_requests_session
 from models import Query, Seed, create_tables, init_database
 import time
 import argparse
+import fcntl
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -24,23 +25,26 @@ DEFAULT_PARAMS = {
 MAX_RESULTS = 10
 ALPHABET = " abcdefghijklmnopqrstuvwxyz0123456789.'-_"
 REQUEST_DELAY = 1.5
+LOCK_FILENAME = '/tmp/query-fetcher.lock'
 
 
-def get_results_for_text(seed_text):
+def get_results_for_seeds(seeds):
 
     # Create a new fetch index.
     last_fetch_index = Seed.select(fn.Max(Seed.fetch_index)).scalar() or 0
     fetch_index = last_fetch_index + 1
 
-    # Create a new seed record from the text
-    seed = Seed.create(
-        fetch_index=fetch_index,
-        seed=seed_text,
-        depth=0,
-    )
+    for seed_text in seeds:
 
-    # Fetch the autocomplete results!
-    get_results(seed)
+        # Create a new seed record from the text
+        seed = Seed.create(
+            fetch_index=fetch_index,
+            seed=seed_text,
+            depth=0,
+        )
+
+        # Fetch the autocomplete results!
+        get_results(seed)
 
 
 def get_results(seed):
@@ -105,14 +109,32 @@ def get_results(seed):
 
 if __name__ == '__main__':
 
+    # Only run this program if it's not already running
+    # Snippet based on
+    # http://linux.byexamples.com/archives/494/how-can-i-avoid-running-a-python-script-multiple-times-implement-file-locking/
+    fp = open(LOCK_FILENAME, 'w')
+    try:
+        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        raise SystemExit(
+            "This program is already running.  Please stop the current process or " +
+            "remove " + LOCK_FILENAME + " to run this script."
+        )
+
+    # Parse arguments
     parser = argparse.ArgumentParser(description="fetch autocomplete queries for a see query.")
-    parser.add_argument('query', help="the query with which to see autocomplete")
+    parser.add_argument('seeds', help="the name of a file containing a list of seed queries.")
     parser.add_argument(
         '--db', help="which type of database to use (postgres, sqlite)." +
         "Defaults to sqlite.")
     parser.add_argument('--db-config', help="Name of file containing database configuration.")
     args = parser.parse_args()
 
+    # Initialize database
     init_database(args.db, config_filename=args.db_config)
     create_tables()
-    get_results_for_text(args.query)
+
+    # Fetch autocomplete results
+    with open(args.seeds) as seeds_file:
+        seeds = [l.strip() for l in seeds_file]
+        get_results_for_seeds(args.seeds)
