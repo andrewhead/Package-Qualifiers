@@ -9,3 +9,4 @@ postgres_version: 9.3
 venv: "{{ projectdir }}/venv"
 src: "{{ projectdir }}/src"
 code_data: "{{ projectdir }}/data"
+long_time: 31536000  # one year in seconds
