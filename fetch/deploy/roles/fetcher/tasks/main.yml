@@ -12,6 +12,9 @@
 - name: Create project directory
   file: state=directory path={{ projectdir }} owner={{ ansible_ssh_user }}
 
+- name: Create data directory
+  file: state=directory path={{ code_data }} owner={{ ansible_ssh_user }}
+
 - name: Install virtualenv
   pip: name=virtualenv
   become: true

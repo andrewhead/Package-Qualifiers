@@ -8,3 +8,4 @@ postgres_port: 5432
 postgres_version: 9.3
 venv: "{{ projectdir }}/venv"
 src: "{{ projectdir }}/src"
+code_data: "{{ projectdir }}/data"
