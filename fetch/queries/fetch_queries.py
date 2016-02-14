@@ -137,4 +137,4 @@ if __name__ == '__main__':
     # Fetch autocomplete results
     with open(args.seeds) as seeds_file:
         seeds = [l.strip() for l in seeds_file]
-        get_results_for_seeds(args.seeds)
+        get_results_for_seeds(seeds)
