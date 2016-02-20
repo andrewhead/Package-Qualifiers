@@ -26,6 +26,7 @@ MAX_RESULTS = 10
 ALPHABET = " abcdefghijklmnopqrstuvwxyz0123456789.'-_"
 REQUEST_DELAY = 1.5
 LOCK_FILENAME = '/tmp/query-fetcher.lock'
+MAX_DEPTH = 5  # this number was in no way empirically determined
 
 
 def get_results_for_seeds(seeds):
@@ -57,6 +58,10 @@ def get_results(seed):
     response = make_request(default_requests_session.get, URL, params=params)
     time.sleep(REQUEST_DELAY)  # enforce a pause between each fetch to be respectful to API
 
+    # Go no further if the call failed
+    if not response:
+        return []
+
     # Store data from the fetched queries
     doc = ElementTree.fromstring(response.text.encode('utf-8'))
     num_results = 0
@@ -82,8 +87,10 @@ def get_results(seed):
             num_results += 1
             rank += 1
 
-    # Only expand this seed into new seeds if we got a full set of results
-    if num_results == MAX_RESULTS and len(valid_results) > 0:
+    # Only expand this seed into new seeds if we got a full set of results and
+    # we have not yet descended to the maximum depth.
+    if num_results == MAX_RESULTS and len(valid_results) > 0 and seed.depth < MAX_DEPTH:
+
         for char in ALPHABET:
 
             # The initial query should be followed by a space.
