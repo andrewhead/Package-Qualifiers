@@ -65,7 +65,6 @@ def get_results(seed):
     # Store data from the fetched queries
     doc = ElementTree.fromstring(response.text.encode('utf-8'))
     num_results = 0
-    valid_results = []
     rank = 1
 
     for comp_sugg in doc.iterfind('CompleteSuggestion'):
@@ -74,22 +73,25 @@ def get_results(seed):
             # Create a new query and add to the database
             data = suggestion.attrib['data']
 
-            if data.startswith(seed.seed):
-                query = Query.create(
-                    fetch_index=fetch_index,
-                    seed=seed,
-                    query=data,
-                    rank=rank,
-                    depth=seed.depth,
-                )
-                valid_results.append(query)
+            # In Fourney et al.'s implementation of CUTS, the returned queries were checked so that
+            # they started with the exactly the seed.  We relax this restriction here.
+            # We note that in some autocomplete entries use valuable synonyms for our
+            # queries, such as converting node -> js or rearranging the terms.  These modified
+            # prefixes yield interesting queries that we don't want to miss.
+            Query.create(
+                fetch_index=fetch_index,
+                seed=seed,
+                query=data,
+                rank=rank,
+                depth=seed.depth,
+            )
 
             num_results += 1
             rank += 1
 
     # Only expand this seed into new seeds if we got a full set of results and
     # we have not yet descended to the maximum depth.
-    if num_results == MAX_RESULTS and len(valid_results) > 0 and seed.depth < MAX_DEPTH:
+    if num_results == MAX_RESULTS and seed.depth < MAX_DEPTH:
 
         for char in ALPHABET:
 
