@@ -5,10 +5,11 @@
 - name: Launch query-fetching job
   command: >
     {{ projectdir }}/venv/bin/python
-    {{ src }}/fetch/queries/fetch_queries.py
-    {{ code_data }}/seeds.txt
+    {{ src }}/fetch/fetch.py
     --db postgres
     --db-config {{ src }}/{{ postgres_config }}
+    queries
+    {{ code_data }}/seeds.txt
   async: "{{ long_time }}"
   poll: 0
   register: fetcher_sleeper
