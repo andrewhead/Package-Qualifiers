@@ -50,3 +50,7 @@ venv
 
 ## Credentials files
 *-credentials.json
+
+## Backups and system artifacts
+.DS_Store
+*.bak
