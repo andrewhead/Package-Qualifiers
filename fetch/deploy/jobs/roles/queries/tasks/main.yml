@@ -6,9 +6,9 @@
   command: >
     {{ projectdir }}/venv/bin/python
     {{ src }}/fetch/fetch.py
+    queries
     --db postgres
     --db-config {{ src }}/{{ postgres_config }}
-    queries
     {{ code_data }}/seeds.txt
   async: "{{ long_time }}"
   poll: 0
