@@ -49,6 +49,31 @@ class Query(Model):
         database = db_proxy
 
 
+class Search(Model):
+    ''' A search query made to a search engine. '''
+
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    query = CharField()
+    page_index = IntegerField()
+    requested_count = IntegerField()
+    result_count_on_page = IntegerField()
+    estimated_results_count = IntegerField()
+
+
+class SearchResult(Model):
+    ''' A result to a search query submitted to a search engine. '''
+
+    search = ForeignKeyField(Search)
+    title = CharField()
+    snippet = CharField(null=True)
+    link = CharField()
+    url = CharField()
+    updated_date = DateTimeField()
+    rank = IntegerField()
+
+
 def init_database(db_type=None, config_filename=None):
 
     if db_type == 'postgres':
@@ -76,4 +101,4 @@ def init_database(db_type=None, config_filename=None):
 
 
 def create_tables():
-    db_proxy.create_tables([Query, Seed], safe=True)
+    db_proxy.create_tables([Query, Seed, Search, SearchResult], safe=True)

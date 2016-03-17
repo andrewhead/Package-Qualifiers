@@ -1,6 +1,6 @@
 # Examples
 
-## Fetching typical queries
+## Fetch typical queries
 
 Here's a command for fetching queries that extend seeds from file `seeds.txt`.
 In the `seeds.txt` file, each seed is listed on a separate line.
@@ -17,6 +17,24 @@ This can specify the username, password, and host for logging into the `fetcher`
 If you want to store this config file elsewhere, you can specify the location of the file:
 
     python fetch.py queries seeds.txt --db postgres --db-config postgres-config.json
+
+# Fetch search results
+
+To fetch search results, you will need two files.
+First, a `queries.txt` file that lists one query per line.
+Second, a `google-credentials.json` file.
+This is a JSON file with two keys, containing the credentials you need to access search.
+One key, `search_id`, is the ID of your custom search engine.
+The other, `api_key`, is your Google Developer API key.
+
+Then, you can fetch search results like this:
+
+    python fetch.py results queries.txt google-credentials.json
+
+By default, the program will ignore results from Stack Overflow so it can focus on fetching tutorial content.
+If you want to include Stack Overflow results, use the `--include-stack-overflow` tag:
+
+    python fetch.py results queries.txt google-credentials.json --include-stack-overflow
 
 # Configuring the database
 

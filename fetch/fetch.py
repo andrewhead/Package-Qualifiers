@@ -5,12 +5,13 @@ from __future__ import unicode_literals
 import logging
 import argparse
 
-import queries
 from models import create_tables, init_database
+import queries
+import results
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-SUBMODULES = [queries]
+SUBMODULES = [queries, results]
 
 
 if __name__ == '__main__':
