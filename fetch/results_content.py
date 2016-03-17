@@ -6,8 +6,8 @@ import logging
 import time
 from peewee import JOIN_LEFT_OUTER
 
+from fetch.api import make_request, default_requests_session
 from models import Search, SearchResult, SearchResultContent
-from api import make_request, default_requests_session
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")

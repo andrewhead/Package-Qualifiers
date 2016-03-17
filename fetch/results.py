@@ -10,9 +10,9 @@ import datetime
 import json
 import re
 
+from fetch.api import make_request, default_requests_session
 from lock import lock_method
 from models import Search, SearchResult
-from api import make_request, default_requests_session
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")

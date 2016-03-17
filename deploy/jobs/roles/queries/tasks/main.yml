@@ -1,9 +1,14 @@
 ---
-- name: Launch job for fetching search results content
+- name: Transfer list of seeds
+  copy: src=seeds.txt dest={{ code_data }}/seeds.txt
+
+- name: Launch query-fetching job
   command: >
     {{ projectdir }}/venv/bin/python
-    {{ src }}/fetch/fetch.py
-    results_content
+    {{ src }}/data.py
+    fetch
+    queries
+    {{ code_data }}/seeds.txt
     --db postgres
     --db-config {{ src }}/{{ postgres_config }}
   async: "{{ long_time }}"

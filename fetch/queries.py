@@ -8,7 +8,7 @@ from peewee import fn
 import time
 
 
-from api import make_request, default_requests_session
+from fetch.api import make_request, default_requests_session
 from models import Query, Seed
 from lock import lock_method
 

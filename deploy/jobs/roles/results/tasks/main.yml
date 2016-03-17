@@ -9,7 +9,8 @@
 - name: Launch job for fetching search results
   command: >
     {{ projectdir }}/venv/bin/python
-    {{ src }}/fetch/fetch.py
+    {{ src }}/data.py
+    fetch
     results
     {{ code_data }}/queries.txt
     {{ src }}/google-credentials.json
