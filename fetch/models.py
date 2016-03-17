@@ -61,6 +61,9 @@ class Search(Model):
     result_count_on_page = IntegerField()
     estimated_results_count = IntegerField()
 
+    class Meta:
+        database = db_proxy
+
 
 class SearchResult(Model):
     ''' A result to a search query submitted to a search engine. '''
@@ -73,6 +76,9 @@ class SearchResult(Model):
     updated_date = DateTimeField()
     rank = IntegerField()
 
+    class Meta:
+        database = db_proxy
+
 
 class SearchResultContent(Model):
     ''' Webpage content at a search results URL. '''
@@ -80,6 +86,9 @@ class SearchResultContent(Model):
     date = DateTimeField(index=True, default=datetime.datetime.now)
     search_result = ForeignKeyField(SearchResult, related_name='content')
     content = TextField()
+
+    class Meta:
+        database = db_proxy
 
 
 def init_database(db_type=None, config_filename=None):
