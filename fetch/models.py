@@ -70,8 +70,8 @@ class SearchResult(Model):
 
     search = ForeignKeyField(Search, related_name='results')
     title = TextField()
-    snippet = CharField(null=True)
-    link = TextField()
+    snippet = TextField(null=True)
+    link = CharField()
     url = CharField()
     updated_date = DateTimeField()
     rank = IntegerField()
