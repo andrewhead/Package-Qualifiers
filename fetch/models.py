@@ -6,7 +6,7 @@ import logging
 import datetime
 import json
 from peewee import Model, SqliteDatabase, Proxy, PostgresqlDatabase, \
-    CharField, IntegerField, ForeignKeyField, DateTimeField
+    CharField, IntegerField, ForeignKeyField, DateTimeField, TextField
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -65,13 +65,21 @@ class Search(Model):
 class SearchResult(Model):
     ''' A result to a search query submitted to a search engine. '''
 
-    search = ForeignKeyField(Search)
+    search = ForeignKeyField(Search, related_name='results')
     title = CharField()
     snippet = CharField(null=True)
     link = CharField()
     url = CharField()
     updated_date = DateTimeField()
     rank = IntegerField()
+
+
+class SearchResultContent(Model):
+    ''' Webpage content at a search results URL. '''
+
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+    search_result = ForeignKeyField(SearchResult, related_name='content')
+    content = TextField()
 
 
 def init_database(db_type=None, config_filename=None):
@@ -101,4 +109,4 @@ def init_database(db_type=None, config_filename=None):
 
 
 def create_tables():
-    db_proxy.create_tables([Query, Seed, Search, SearchResult], safe=True)
+    db_proxy.create_tables([Query, Seed, Search, SearchResult, SearchResultContent], safe=True)

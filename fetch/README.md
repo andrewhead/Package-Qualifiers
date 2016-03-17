@@ -36,6 +36,26 @@ If you want to include Stack Overflow results, use the `--include-stack-overflow
 
     python fetch.py results queries.txt google-credentials.json --include-stack-overflow
 
+# Fetch webpages for search results
+
+To get the HTML content for search results, run:
+
+    python fetch.py results_content
+
+This will fetch content for all pages that haven't yet been downloaded.
+To fetch content for specific search results, you have a couple of options:
+
+    python fetch.py results_content --fetch-indexes 2
+
+for example, will fetch content for all results that are associated with a search with the 'fetch index' of 2.
+You can provide a list of acceptable fetch indexes by specifying a space-delimited list of indexes on the command line.
+You can also do this:
+
+    python fetch.py results_content --fetch-all
+
+To fetch the content for all search results retrieved so far.
+This could be helpful if you want to retrieve contents for search results more than once.
+
 # Configuring the database
 
 You can specify the type of database and database configuration for any fetching command.

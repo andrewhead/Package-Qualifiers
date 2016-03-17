@@ -8,10 +8,11 @@ import argparse
 from models import create_tables, init_database
 import queries
 import results
+import results_content
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-SUBMODULES = [queries, results]
+SUBMODULES = [queries, results, results_content]
 
 
 if __name__ == '__main__':
