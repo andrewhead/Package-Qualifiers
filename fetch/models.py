@@ -69,9 +69,9 @@ class SearchResult(Model):
     ''' A result to a search query submitted to a search engine. '''
 
     search = ForeignKeyField(Search, related_name='results')
-    title = CharField()
+    title = TextField()
     snippet = CharField(null=True)
-    link = CharField()
+    link = TextField()
     url = CharField()
     updated_date = DateTimeField()
     rank = IntegerField()
