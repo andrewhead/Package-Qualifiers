@@ -54,7 +54,7 @@ def main(fetch_all, fetch_indexes, *args, **kwargs):
 
 
 def configure_parser(parser):
-    parser.description = "fetch HTML contents for webpages at search results URLs." +\
+    parser.description = "Fetch HTML contents for webpages at search results URLs." +\
         "The default action is to fetch only search results for which no contents have been " +\
         "fetched before."
     parser.add_argument(

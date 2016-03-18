@@ -123,7 +123,7 @@ def main(queries, google_config, include_stack_overflow, *args, **kwargs):
 
 def configure_parser(parser):
 
-    parser.description = "fetch top search results for a set of packages"
+    parser.description = "Fetch top search results for a set of packages"
     parser.add_argument('queries', help="the name of a file containing a list of queries")
     parser.add_argument(
         'google_config',

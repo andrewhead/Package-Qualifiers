@@ -126,7 +126,7 @@ def main(seeds, *args, **kwargs):
 
 
 def configure_parser(parser):
-    parser.description = "fetch autocomplete queries for a see query."
+    parser.description = "Fetch autocomplete queries for a see query."
     parser.add_argument(
         'seeds',
         type=str,

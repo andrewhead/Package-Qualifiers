@@ -7,6 +7,7 @@ import argparse
 
 from models import create_tables, init_database
 from fetch import queries, results, results_content
+from import_ import stackoverflow
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -19,7 +20,7 @@ COMMANDS = {
     'import': {
         'description': "Import data from a local data source.",
         'module_help': "Type of data to import.",
-        'modules': [],
+        'modules': [stackoverflow],
     },
 }
 

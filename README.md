@@ -66,17 +66,19 @@ This could be helpful if you want to retrieve contents for search results more t
 
 To import Stack Overflow posts from an XML file containing posts data, run:
 
-    python data.py import posts Posts.xml
+    python data.py import stackoverflow posts Posts.xml
 
-For additional data types (e.g., votes, users, and tags), see the help for the `import` subcommand.
-A Stack Overflow dump can be found on [The Internet Archive](https://archive.org/details/stackexchange).
-Just like for the `fetch` commands, you can also set the `--db` and `--db-config` parameters to import the data into a specific database.
+For other data types (e.g., votes, users, and tags), change `posts` to the data type you want to import and `Posts.xml` to the file containing data.
+See the help for the `import` subcommand for the types of data you can import.
 
 Because importing data will take a while, you can view the progress with:
 
-    python data.py import posts Posts.xml --show-progress
+    python data.py import stackoverflow posts Posts.xml --show-progress
 
 Though note that showing progress might yield a pretty large output log, if you are collecting one.
+
+A Stack Overflow dump can be found on [The Internet Archive](https://archive.org/details/stackexchange).
+Just like for the `fetch` commands, you can also set the `--db` and `--db-config` parameters to import the data into a specific database.
 
 ## Running this on a remote host
 
