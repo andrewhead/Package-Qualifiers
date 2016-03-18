@@ -5,10 +5,11 @@ from __future__ import unicode_literals
 import logging
 import xml.etree.cElementTree as etree
 import re
-import peewee
 import os.path
 from progressbar import ProgressBar, Percentage, Bar, ETA, Counter, RotatingMarker
+import copy
 
+from models import db_proxy
 from models import Post, Tag, PostHistory, PostLink, Vote, Comment, Badge, User
 
 
@@ -29,16 +30,59 @@ DATA_TYPES = {
 }
 
 
+# A cache for storing translations of camel case spellings to underscores
+translation_cache = {}
+
+
 def camel_case_to_underscores(string):
     '''
     Method courtesy of Stack Overflow user epost:
     http://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-snake-case
     '''
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    if string in translation_cache:
+        return translation_cache[string]
+    else:
+        translated1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
+        translated2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', translated1).lower()
+        translation_cache[string] = translated2
+        return translated2
 
 
-def main(data_type, data_file, show_progress, *args, **kwargs):
+def pad_data(rows):
+    '''
+    Before we can bulk insert rows, they all need to have the same
+    fields.  This method adds the missing fields to all rows to make
+    sure they all describe the same fields.  It does this destructively
+    to the rows provided as input.
+    '''
+
+    # Collec the union of all field names
+    field_names = set()
+    for row in rows:
+        field_names = field_names.union(row.keys())
+
+    # We'll enforce that default for all unspecified fields is NULL
+    default_data = {field_name: None for field_name in field_names}
+
+    # Pad each row with the missing fields
+    for i, _ in enumerate(rows):
+        updated_data = copy.copy(default_data)
+        updated_data.update(rows[i])
+        rows[i] = updated_data
+
+
+def insert_data(Model, data):
+    '''
+    Insert data into the database in a batch.
+    Data is passed in as a list of dictionaries, where each dictionary is a
+    list of field names and their values.
+    '''
+    pad_data(data)
+    with db_proxy.atomic():
+        Model.insert_many(data).execute()
+
+
+def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
     '''
     Parsing procedure is based on a script by a user on the Meta Stack Exchange:
     http://meta.stackexchange.com/questions/28221/scripts-to-convert-data-dump-to-other-formats
@@ -62,6 +106,7 @@ def main(data_type, data_file, show_progress, *args, **kwargs):
     # Read data from XML file and load it into the table
     with open(data_file) as data_file_obj:
 
+        rows = []
         tree = etree.iterparse(data_file_obj)
         for event, row in tree:
 
@@ -78,20 +123,18 @@ def main(data_type, data_file, show_progress, *args, **kwargs):
                 renamed_attributes['class_'] = renamed_attributes['class']
                 del(renamed_attributes['class'])
 
-            # Create the entry with all of the attributes found in the XML
-            try:
-                Model.create(**renamed_attributes)
-            except peewee.IntegrityError as e:
-                logging.warn(
-                    "IntegrityError (%s) adding record %d. " +
-                    "It may have already been added to the database",
-                    str(e), int(renamed_attributes['id']),
-                )
+            rows += [renamed_attributes]
+            if len(rows) == batch_size:
+                insert_data(Model, rows)
+                rows = []
 
             if show_progress:
                 string_size = len(etree.tostring(row))
                 amount_read += string_size
                 progress_bar.update(amount_read)
+
+    # Insert any remaining data that wasn't in one of the batches
+    insert_data(Model, rows)
 
     if show_progress:
         progress_bar.finish()
@@ -107,6 +150,15 @@ def configure_parser(parser):
     parser.add_argument(
         'data_file',
         help="XML file containing a dump of Stack Overflow data."
+    )
+    parser.add_argument(
+        '--batch-size',
+        type=int,
+        default=20,
+        help="The number of records to insert at a time. Increasing this value " +
+        "should greatly increase the speed of importing data. " +
+        "The default value %(default)s was chosen to work " +
+        "for all models, for all databases."
     )
     parser.add_argument(
         '--show-progress',
