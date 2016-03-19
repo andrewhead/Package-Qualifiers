@@ -80,6 +80,17 @@ Though note that showing progress might yield a pretty large output log, if you 
 A Stack Overflow dump can be found on [The Internet Archive](https://archive.org/details/stackexchange).
 Just like for the `fetch` commands, you can also set the `--db` and `--db-config` parameters to import the data into a specific database.
 
+## Computing derived data
+
+If you want to compute derived table based on already fetched or imported data, you can use the `compute` commands.
+For example:
+
+    python data.py compute post_tags
+
+will compute the table that links Stack Overflow posts to their tags.
+You can see a list of available computations by running `python data.py compute --help`.
+Just like for the commands for fetching and importing data, you can specify your data with the `--db` and `--db-config` parameters.
+
 ## Running this on a remote host
 
 See the README in the `deploy` directory for instructions on how to deploy these routines to a remote host.

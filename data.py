@@ -8,6 +8,7 @@ import argparse
 from models import create_tables, init_database
 from fetch import queries, results, results_content
 from import_ import stackoverflow
+from compute import post_tags
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -22,6 +23,11 @@ COMMANDS = {
         'module_help': "Type of data to import.",
         'modules': [stackoverflow],
     },
+    'compute': {
+        'description': "Compute derived fields from existing data.",
+        'module_help': "Type of data to compute.",
+        'modules': [post_tags],
+    }
 }
 
 

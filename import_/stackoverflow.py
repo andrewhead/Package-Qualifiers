@@ -7,9 +7,8 @@ import xml.etree.cElementTree as etree
 import re
 import os.path
 from progressbar import ProgressBar, Percentage, Bar, ETA, Counter, RotatingMarker
-import copy
 
-from models import db_proxy
+from models import BatchInserter
 from models import Post, Tag, PostHistory, PostLink, Vote, Comment, Badge, User
 
 
@@ -48,48 +47,14 @@ def camel_case_to_underscores(string):
         return translated2
 
 
-def pad_data(rows):
-    '''
-    Before we can bulk insert rows, they all need to have the same
-    fields.  This method adds the missing fields to all rows to make
-    sure they all describe the same fields.  It does this destructively
-    to the rows provided as input.
-    '''
-
-    # Collec the union of all field names
-    field_names = set()
-    for row in rows:
-        field_names = field_names.union(row.keys())
-
-    # We'll enforce that default for all unspecified fields is NULL
-    default_data = {field_name: None for field_name in field_names}
-
-    # Pad each row with the missing fields
-    for i, _ in enumerate(rows):
-        updated_data = copy.copy(default_data)
-        updated_data.update(rows[i])
-        rows[i] = updated_data
-
-
-def insert_data(Model, data):
-    '''
-    Insert data into the database in a batch.
-    Data is passed in as a list of dictionaries, where each dictionary is a
-    list of field names and their values.
-    '''
-    pad_data(data)
-    with db_proxy.atomic():
-        Model.insert_many(data).execute()
-
-
 def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
     '''
     Parsing procedure is based on a script by a user on the Meta Stack Exchange:
     http://meta.stackexchange.com/questions/28221/scripts-to-convert-data-dump-to-other-formats
     '''
 
-    # Fetch the type of database model that we'll be creating
     Model = DATA_TYPES[data_type]
+    batch_inserter = BatchInserter(Model, batch_size, fill_missing_fields=True)
 
     # Set up progress bar.
     if show_progress:
@@ -106,7 +71,6 @@ def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
     # Read data from XML file and load it into the table
     with open(data_file) as data_file_obj:
 
-        rows = []
         tree = etree.iterparse(data_file_obj)
         for event, row in tree:
 
@@ -123,10 +87,7 @@ def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
                 renamed_attributes['class_'] = renamed_attributes['class']
                 del(renamed_attributes['class'])
 
-            rows += [renamed_attributes]
-            if len(rows) == batch_size:
-                insert_data(Model, rows)
-                rows = []
+            batch_inserter.insert(renamed_attributes)
 
             if show_progress:
                 string_size = len(etree.tostring(row))
@@ -134,7 +95,7 @@ def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
                 progress_bar.update(amount_read)
 
     # Insert any remaining data that wasn't in one of the batches
-    insert_data(Model, rows)
+    batch_inserter.flush()
 
     if show_progress:
         progress_bar.finish()
