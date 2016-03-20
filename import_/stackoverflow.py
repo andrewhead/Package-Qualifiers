@@ -71,10 +71,19 @@ def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
     # Read data from XML file and load it into the table
     with open(data_file) as data_file_obj:
 
-        tree = etree.iterparse(data_file_obj)
+        # Events need to be written as "bytes".
+        # Reference: http://bugs.python.org/msg110252
+        # By default in this file, strings are declared as Unicode, so we declare them as bytes
+        tree = etree.iterparse(data_file_obj, events=(b'start', b'end'))
         for event, row in tree:
 
-            # Check that this is a primary record in the file
+            # Save the parent element of the rows so that we can clean up memory as we go
+            # Apparently, `iterparse` isn't good at cleaning up after itself
+            # (http://stackoverflow.com/questions/7697710/python-running-out-of-memory-parsing-xml-using-celementtree-iterparse).
+            if event == 'start' and row.tag != 'row':
+                parent_element = row
+
+            # Skip this row if it is not a primary record in the file
             if not (event == 'end' and row.tag == 'row'):
                 continue
 
@@ -93,6 +102,10 @@ def main(data_type, data_file, batch_size, show_progress, *args, **kwargs):
                 string_size = len(etree.tostring(row))
                 amount_read += string_size
                 progress_bar.update(amount_read)
+
+            # Clean up the allocated XML element
+            row.clear()
+            parent_element.remove(row)
 
     # Insert any remaining data that wasn't in one of the batches
     batch_inserter.flush()
