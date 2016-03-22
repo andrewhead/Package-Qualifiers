@@ -83,12 +83,20 @@ def main(batch_size, show_progress, *args, **kwargs):
         for post_id, tag_names in post_tag_names.items():
 
             for tag_name in tag_names:
+
                 if tag_name in tag_cache:
                     tag = tag_cache[tag_name]
                 else:
-                    tag = Tag.get(tag_name=tag_name)
+                    try:
+                        tag = Tag.get(tag_name=tag_name)
+                    except Tag.DoesNotExist:
+                        tag = None
                     tag_cache[tag_name] = tag
-                batch_inserter.insert({'post_id': post_id, 'tag_id': tag.id})
+
+                if tag is not None:
+                    batch_inserter.insert({'post_id': post_id, 'tag_id': tag.id})
+                else:
+                    logging.warn("No tag found for tag name [%s] for post %d", tag_name, post_id)
 
         id_window_start += ID_HOP
 
