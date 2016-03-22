@@ -91,6 +91,18 @@ will compute the table that links Stack Overflow posts to their tags.
 You can see a list of available computations by running `python data.py compute --help`.
 Just like for the commands for fetching and importing data, you can specify your data with the `--db` and `--db-config` parameters.
 
+## Running migrations
+
+If the models have been updated since you created your tables, you should run migrations on your database:
+
+    python data.py migrate run_migration 0001_add_index_tag_excerpt_post_id
+
+Where the last argument (`0001_add_index_tag_excerpt_post_id` in this case) is the name of the migration you want to run.
+To see the available migrations, call `python data.py migrate run_migration --help`).
+
+If you update the models, please write a migration that others can apply to their database.
+See instructions in the sections below.
+
 ## Running this on a remote host
 
 See the README in the `deploy` directory for instructions on how to deploy these routines to a remote host.
@@ -110,3 +122,19 @@ A module for fetching or importing a specific type of data should have, at the l
 
 New modules should be added to the appropriate `SUBMODULES` lists at the top of the `data.py` file.
 The `main` method of a fetching module can optionally be wrapped with the `lock_method(<filename>)` decorator, which enforces that the main method is only invoked once at a time.
+
+## Writing a migration
+
+If you update a model, it's a necessary courtesy to others to write a migration script that will apply to existing databases to bring them up to date.
+
+Migrations are easy to write.
+First, create a Python module in the `migrate` directory.
+Its file name should start with a four-digit index after the index of the last-written migration (e.g., `0007` if the last migration started with `0006`).
+
+Then, write the forward migration procedure.
+You do this by instantiating a single method called `forward`, that takes a `migrator` as its only argument.
+Call Peewee `migrate` methods on this object to transform the database.
+For a list of available migration methods, see the [Peewee docs](http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#schema-migrations).
+This should only take a few lines of code.
+
+We're only supporting forward migrations for now.
