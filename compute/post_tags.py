@@ -10,44 +10,65 @@ from models import Post, Tag, PostTag
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-PAGE_LENGTH = 1000  # chosen to be some number of posts that will probably fit into memory
+
+# Paginating with Peewee is very slow, as it requires counting up the entries
+# in the pages before for each new query for a page.  But we want to do some
+# paginating, so that we can process SELECT statements as a group, instead of one
+# for each post that we're considering.
+# While there may be some more efficient way of paginating on SQL record index with
+# the Postgres driver directly, we use a workaround that can work with Peewee.
+# IDs are already indexes and can be queried very quickly.
+# So we provide a range of IDs that we're looking at, instead of a range of row indexes.
+# In the posts dataset we have already uploaded to SQL, we see that there are, on average
+# 1000 records for a jump in ID of 1200.  So to query around ~1000 posts at a time,
+# we select ranges of IDs that are 1200 long.
+ID_HOP = 1200
 
 
 def main(batch_size, show_progress, *args, **kwargs):
 
     batch_inserter = BatchInserter(PostTag, batch_size=batch_size)
 
+    # Get the ID of the record with the highest ID.
+    last_id = (
+        Post
+        .select()
+        .order_by(Post.id.desc())
+        .get()
+        .id
+    )
+
     if show_progress:
-        progress_bar = ProgressBar(maxval=Post.select().count(), widgets=[
+        progress_bar = ProgressBar(maxval=last_id, widgets=[
             'Progress: ', Percentage(),
             ' ', Bar(marker=RotatingMarker()),
             ' ', ETA(),
-            ' Tagged ', Counter(), ' posts.'
+            ' Processing ID ', Counter(), ' / ' + str(last_id) + '.'
         ])
         progress_bar.start()
-
-    post_count = Post.select().count()
-    posts_processed = 0
 
     # There are a small number of tags (~50,000 at the time of writing this),
     # so we just cache them all in a map from name to model to avoid
     # unnecessary queries.
     tag_cache = {}
 
-    # We intentionally separate the iterators through the different models,
-    # and do all selections and insertions in batches.  We found out that
-    # having nested iterators over database objects caused the cursor
-    # to jump around in one of the iterators, so we're sticking to one
-    # iterator at a time.
+    # In previous versions of this code, we intentionally separated the iterators through
+    # the different models, and did all selections and insertions in batches.  We found out that
+    # having nested iterators over database objects caused the cursor to jump around in one
+    # of the iterators, so we're sticking to one iterator at a time.
+    id_window_start = 0
+    while id_window_start <= last_id:
 
-    # Pages with Peewee queries are indexed starting at 1
-    last_page = (post_count / PAGE_LENGTH) + 1
-    for post_page in range(1, last_page + 2):
+        if show_progress:
+            progress_bar.update(id_window_start)
 
-        posts = Post.select().paginate(post_page, paginate_by=PAGE_LENGTH)
+        posts = Post.select().where(
+            Post.id >= id_window_start,
+            Post.id < id_window_start + ID_HOP
+        )
         post_tag_names = {}
 
-        for post_index, post in enumerate(posts):
+        for post in posts:
 
             tags_string = post.tags
             if tags_string is not None:
@@ -59,14 +80,6 @@ def main(batch_size, show_progress, *args, **kwargs):
                 tag_names = [s.rstrip('>').lstrip('<') for s in tags_string.split('><')]
                 post_tag_names[post.id] = tag_names
 
-            posts_processed += 1
-            if show_progress:
-                progress_bar.update(posts_processed)
-
-            # Break out from loop early if this is the last page
-            if post_page == last_page and post_index == (post_count % PAGE_LENGTH) - 1:
-                break
-
         for post_id, tag_names in post_tag_names.items():
 
             for tag_name in tag_names:
@@ -77,9 +90,10 @@ def main(batch_size, show_progress, *args, **kwargs):
                     tag_cache[tag_name] = tag
                 batch_inserter.insert({'post_id': post_id, 'tag_id': tag.id})
 
+        id_window_start += ID_HOP
+
     batch_inserter.flush()
 
-    print posts_processed
     if show_progress:
         progress_bar.finish()
 
