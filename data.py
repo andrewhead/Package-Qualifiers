@@ -9,6 +9,7 @@ from models import create_tables, init_database
 from fetch import queries, results, results_content
 from import_ import stackoverflow
 from compute import post_tags
+from migrate import run_migration
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -27,7 +28,14 @@ COMMANDS = {
         'description': "Compute derived fields from existing data.",
         'module_help': "Type of data to compute.",
         'modules': [post_tags],
-    }
+    },
+    'migrate': {
+        'description':
+            "Manage database migrations. (Should only be necessary if you initialized " +
+            "your database and then the model files were updated.)",
+        'module_help': "Migration operation.",
+        'modules': [run_migration],
+    },
 }
 
 
@@ -53,6 +61,7 @@ if __name__ == '__main__':
             # Add default arguments for each fetcher (database configuration)
             module_parser.add_argument(
                 '--db',
+                default='sqlite',
                 help="which type of database to use (postgres, sqlite). Defaults to sqlite."
             )
             module_parser.add_argument(

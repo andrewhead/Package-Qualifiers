@@ -204,7 +204,7 @@ class Tag(ProxyModel):
     # We will look up tags based on their tag names when making PostTags
     tag_name = CharField(index=True, max_length=70)
     count = IntegerField()
-    excerpt_post_id = IntegerField(null=True)
+    excerpt_post_id = IntegerField(index=True, null=True)
     wiki_post_id = IntegerField(null=True)
 
 
@@ -287,7 +287,7 @@ class PostTag(ProxyModel):
     tag_id = IntegerField(index=True)
 
 
-def init_database(db_type=None, config_filename=None):
+def init_database(db_type, config_filename=None):
 
     if db_type == 'postgres':
 
