@@ -103,6 +103,20 @@ To see the available migrations, call `python data.py migrate run_migration --he
 If you update the models, please write a migration that others can apply to their database.
 See instructions in the sections below.
 
+## Dumping data
+
+It might be necessary to dump data to file.
+You can dump special data types to file, for example:
+
+    python data.py dump node_post_stats
+
+This produces a file `data/dump.node_post_stats-<timestamp` in JSON format.
+Run `python data.py dump -h` to see what types of data can already be dumped.
+And be patient---especially when these files have to do a digest of millions of rows of a table, these scripts may take a while.
+
+You are welcome to write your own data dumping routines.
+See the "Contributing" section.
+
 ## Running this on a remote host
 
 See the README in the `deploy` directory for instructions on how to deploy these routines to a remote host.
@@ -138,3 +152,9 @@ For a list of available migration methods, see the [Peewee docs](http://docs.pee
 This should only take a few lines of code.
 
 We're only supporting forward migrations for now.
+
+## Writing a data dump module
+
+To add a script for dumping a certain type of data, decorate the `main` function of your module with `dump_json` from the `dump` module.
+This decorator takes one argument: the basename of a file to save in the `data/` directory.
+The `main` should do some queries to the database, and `yield` lists of records that will be saved as JSON.
