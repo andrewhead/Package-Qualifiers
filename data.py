@@ -10,6 +10,7 @@ from fetch import queries, results, results_content
 from import_ import stackoverflow
 from compute import post_tags
 from migrate import run_migration
+from dump import node_post_stats, popular_tag_post_stats
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -35,6 +36,11 @@ COMMANDS = {
             "your database and then the model files were updated.)",
         'module_help': "Migration operation.",
         'modules': [run_migration],
+    },
+    'dump': {
+        'description': "Dump data to a JSON file.",
+        'module_help': "Type of data to dump.",
+        'modules': [node_post_stats, popular_tag_post_stats],
     },
 }
 

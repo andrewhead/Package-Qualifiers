@@ -50,7 +50,14 @@ venv
 
 ## Credentials files
 *-credentials.json
+*-config.json
 
 ## Backups and system artifacts
 .DS_Store
 *.bak
+
+## DATA
+# Generally speaking, all data should be stored on Postgres, or procedures
+# for generating it should be in the research notes.  It's too much bit-churn
+# to commit individual data files that could be megabytes large.
+data
