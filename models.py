@@ -287,6 +287,36 @@ class PostTag(ProxyModel):
     tag_id = IntegerField(index=True)
 
 
+class Task(ProxyModel):
+    ''' A task that describes what you can do with a software package. '''
+    compute_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+    task = TextField(index=True)
+    search_result_content = ForeignKeyField(SearchResultContent, index=True)
+
+
+class Verb(ProxyModel):
+    ''' A lemmatized verb that found in programming documentation. '''
+    verb = TextField(index=True)
+
+
+class Noun(ProxyModel):
+    ''' A lemmatized noun that found in programming documentation. '''
+    noun = TextField(index=True)
+
+
+class TaskVerb(ProxyModel):
+    ''' A link that connects a verb to a task description it was discovered in. '''
+    task = ForeignKeyField(Task, index=True)
+    verb = ForeignKeyField(Verb, index=True)
+
+
+class TaskNoun(ProxyModel):
+    ''' A link that connects a noun to a task description it was discovered in. '''
+    task = ForeignKeyField(Task, index=True)
+    noun = ForeignKeyField(Noun, index=True)
+
+
 def init_database(db_type, config_filename=None):
 
     if db_type == 'postgres':
@@ -329,4 +359,9 @@ def create_tables():
         Badge,
         User,
         PostTag,
+        Task,
+        TaskNoun,
+        TaskVerb,
+        Noun,
+        Verb,
     ], safe=True)
