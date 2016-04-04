@@ -6,6 +6,7 @@
   - python-pip
   - python-boto
   - python-dev
+  - libncurses5-dev
   tags: systempkgs
   become: true
 
