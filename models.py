@@ -292,6 +292,7 @@ class Task(ProxyModel):
     compute_index = IntegerField()
     date = DateTimeField(index=True, default=datetime.datetime.now)
     task = TextField(index=True)
+    mode = TextField(index=True)
     search_result_content = ForeignKeyField(SearchResultContent, index=True)
 
 
