@@ -26,10 +26,9 @@ MAX_RESULTS = 10
 ALPHABET = " abcdefghijklmnopqrstuvwxyz0123456789.'-_"
 REQUEST_DELAY = 1.5
 LOCK_FILENAME = '/tmp/query-fetcher.lock'
-MAX_DEPTH = 5  # this number was in no way empirically determined
 
 
-def get_results_for_seeds(seeds):
+def get_results_for_seeds(seeds, max_depth):
 
     # Create a new fetch index.
     last_fetch_index = Seed.select(fn.Max(Seed.fetch_index)).scalar() or 0
@@ -45,10 +44,10 @@ def get_results_for_seeds(seeds):
         )
 
         # Fetch the autocomplete results!
-        get_results(seed)
+        get_results(seed, max_depth)
 
 
-def get_results(seed):
+def get_results(seed, max_depth):
 
     fetch_index = seed.fetch_index
 
@@ -91,7 +90,7 @@ def get_results(seed):
 
     # Only expand this seed into new seeds if we got a full set of results and
     # we have not yet descended to the maximum depth.
-    if num_results == MAX_RESULTS and seed.depth < MAX_DEPTH:
+    if num_results == MAX_RESULTS and seed.depth < max_depth:
 
         for char in ALPHABET:
 
@@ -113,16 +112,16 @@ def get_results(seed):
             )
 
             # Fetch results for the new seed.
-            get_results(new_seed)
+            get_results(new_seed, max_depth)
 
 
 @lock_method(LOCK_FILENAME)
-def main(seeds, *args, **kwargs):
+def main(seeds, depth_level, *args, **kwargs):
 
     # Fetch autocomplete results
     with open(seeds) as seeds_file:
         seeds = [l.strip() for l in seeds_file]
-        get_results_for_seeds(seeds)
+        get_results_for_seeds(seeds, depth_level)
 
 
 def configure_parser(parser):
@@ -131,4 +130,14 @@ def configure_parser(parser):
         'seeds',
         type=str,
         help="the name of a file containing a list of seed queries."
+    )
+    parser.add_argument(
+        '--depth-level',
+        type=int,
+        help="how many letters to vary beyond after each seed query." +
+             "Decrease this number for faster fetching.",
+        # This default depth of 5 will fetch queries relating to very popular Node.js
+        # packages in less than a day.  A depth larger than 5 seems to take unreasonably long
+        # for seeds for very popular packages.
+        default=5,
     )
