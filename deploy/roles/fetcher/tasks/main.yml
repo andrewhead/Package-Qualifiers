@@ -1,4 +1,15 @@
 ---
+# Source: http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html
+- name: Enable JDK auto-installation
+  shell: echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+  tags: systempkgs
+  become: true
+
+- name: Add repository for installing JDK 1.8
+  apt_repository: repo='ppa:webupd8team/java' update_cache=yes
+  tags: systempkgs
+  become: true
+
 - name: Install server software
   apt: name={{ item }} update_cache=yes
   with_items:
@@ -7,6 +18,7 @@
   - python-boto
   - python-dev
   - libncurses5-dev
+  - oracle-java8-installer
   tags: systempkgs
   become: true
 
