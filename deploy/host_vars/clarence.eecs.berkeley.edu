@@ -1,4 +1,8 @@
 appname: fetcher
+groupname: fetcher
+group_users:
+- andrew
+- austin
 projectdir: /home/{{ ansible_user }}/drive
 repo: https://github.com/andrewhead/Package-Qualifiers.git
 privatebucket: readme-fetcher

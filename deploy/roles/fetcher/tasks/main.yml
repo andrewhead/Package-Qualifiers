@@ -22,11 +22,24 @@
   tags: systempkgs
   become: true
 
+- name: Create group for administering application
+  group: name={{ groupname }}
+  tags: users
+  become: true
+
+- name: Add users to admin group
+  user: name={{ item }} groups={{ groupname }} append=yes
+  with_items: "{{ group_users }}"
+  tags: users
+  become: true
+
 - name: Create project directory
-  file: state=directory path={{ projectdir }} owner={{ ansible_ssh_user }}
+  file: state=directory path={{ projectdir }} owner={{ ansible_ssh_user }} group={{ groupname }}
+  become: true
 
 - name: Create data directory
-  file: state=directory path={{ code_data }} owner={{ ansible_ssh_user }}
+  file: state=directory path={{ code_data }} owner={{ ansible_ssh_user }} group={{ groupname }}
+  become: true
 
 - name: Install virtualenv
   pip: name=virtualenv
@@ -42,6 +55,10 @@
 
 - name: Checkout source code
   git: repo={{ repo }} dest={{ src }} force=yes recursive=yes
+  tags: updatecode
+
+- name: Assign source code permissions to full group
+  file: state=directory path={{ src }} group={{ groupname }} recurse=yes
   tags: updatecode
 
 - name: Fetch PostgreSQL configuration
