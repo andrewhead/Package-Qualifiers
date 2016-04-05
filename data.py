@@ -8,7 +8,7 @@ import argparse
 from models import create_tables, init_database
 from fetch import queries, results, results_content
 from import_ import stackoverflow
-from compute import post_tags
+from compute import post_tags, tasks
 from migrate import run_migration
 from dump import node_post_stats, popular_tag_post_stats
 
@@ -28,7 +28,7 @@ COMMANDS = {
     'compute': {
         'description': "Compute derived fields from existing data.",
         'module_help': "Type of data to compute.",
-        'modules': [post_tags],
+        'modules': [post_tags, tasks],
     },
     'migrate': {
         'description':

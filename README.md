@@ -91,6 +91,9 @@ will compute the table that links Stack Overflow posts to their tags.
 You can see a list of available computations by running `python data.py compute --help`.
 Just like for the commands for fetching and importing data, you can specify your data with the `--db` and `--db-config` parameters.
 
+If you run the `compute tasks` command, you *must* specify a `--db-config`.
+The Java program that this command wraps connects only to Postgres and does not share the default database configuration of the rest of the project.
+
 ## Running migrations
 
 If the models have been updated since you created your tables, you should run migrations on your database:

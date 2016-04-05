@@ -61,3 +61,8 @@ venv
 # for generating it should be in the research notes.  It's too much bit-churn
 # to commit individual data files that could be megabytes large.
 data
+
+## DEPENDENCIES
+# Some commands depend on external Java JARs.  We don't commit them, as they
+# are pre-compiled and rather large.
+*.jar
