@@ -6,7 +6,7 @@ import logging
 import argparse
 
 from models import create_tables, init_database
-from fetch import queries, results, results_content
+from fetch import queries, results, results_content, histories
 from import_ import stackoverflow
 from compute import post_tags, tasks
 from migrate import run_migration
@@ -18,7 +18,7 @@ COMMANDS = {
     'fetch': {
         'description': "Fetch data from the web.",
         'module_help': "Type of data to fetch.",
-        'modules': [queries, results, results_content],
+        'modules': [queries, results, results_content, histories],
     },
     'import': {
         'description': "Import data from a local data source.",

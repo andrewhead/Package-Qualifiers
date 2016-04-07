@@ -145,6 +145,38 @@ class SearchResultContent(ProxyModel):
     content = TextField()
 
 
+class WebPageVersion(ProxyModel):
+    '''
+    A version of a web page at a URL as indexed by the Internet Archive.
+    All fields beyond the URL are named based on their equivalent names in the Wayback
+    Machine CDX API: https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server
+
+    I believe they really mean the following, but have found no authoratative documents on this:
+    * timestamp: the date and time this version of the page was crawled
+    * original: the precise URL that was queried to find this page during the crawl
+    * statuscode: the HTTP status code returned when this page was queried.  In some cases this
+    *   might contain a 302 for a redirect.  I have also seen the value "-"
+    * digest: a hash of the queried content.  (It might be that if two version share the same
+    *   digest that they have the same content.)
+    * length: size of the page in bytes
+    '''
+
+    # Fetch logistics
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    url = TextField(index=True)
+    url_key = TextField()
+    timestamp = DateTimeField(index=True)
+    original = TextField()
+    mime_type = TextField()
+    # Status code is a text field as several test records we inspected had "-" for the status
+    # instead of some integer value
+    status_code = TextField(index=True)
+    digest = TextField(index=True)
+    length = IntegerField()
+
+
 class Post(ProxyModel):
     '''
     A post from Stack Overflow.
@@ -351,6 +383,7 @@ def create_tables():
         Search,
         SearchResult,
         SearchResultContent,
+        WebPageVersion,
         Post,
         Tag,
         PostHistory,
