@@ -56,7 +56,7 @@ def _wrap_harvest_func_with_dump_func(harvest_func, dump_func, dest_basename, fi
     @functools.wraps(harvest_func)
     def harvest_and_dump(*args, **kwargs):
 
-        full_filename = dest_basename + time.strftime("%Y-%m-%d_%H:%M:%S") + file_extension
+        full_filename = dest_basename + '-' + time.strftime("%Y-%m-%d_%H:%M:%S") + file_extension
         dump_path = os.path.join('data', full_filename)
 
         with codecs.open(dump_path, 'w', encoding='utf8') as dump_file:

@@ -10,7 +10,7 @@ from fetch import queries, results, results_content, histories
 from import_ import stackoverflow
 from compute import post_tags, tasks
 from migrate import run_migration
-from dump import node_post_stats, popular_tag_post_stats
+from dump import node_post_stats, popular_tag_post_stats, package_top_queries
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -40,7 +40,7 @@ COMMANDS = {
     'dump': {
         'description': "Dump data to a JSON file.",
         'module_help': "Type of data to dump.",
-        'modules': [node_post_stats, popular_tag_post_stats],
+        'modules': [node_post_stats, popular_tag_post_stats, package_top_queries],
     },
 }
 
