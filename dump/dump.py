@@ -14,41 +14,84 @@ import os.path
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
+'''
+The decorators named 'dump_*' take a "harvest" function that yields records,
+and then pipes these records to a file in the data/ directory with the basename
+specified by the 'dest_basename' argument.
+
+For example,
+
+@dump_json('json-data')
+def my_func(*args, **kwargs):
+    ...
+
+Will run my_func as a generator.  With each invokation of the generator, it will
+collect a JSON record or a list of records, and then dump those to a file
+with the basename "json-data".
+'''
+
+
 def dump_json(dest_basename):
-    ''' Iterate over a generator function to dump JSON records to file. '''
+    ''' Iterate over a generator function and dump its JSON records to file. '''
+    return functools.partial(
+        _wrap_harvest_func_with_dump_func,
+        dump_func=run_and_dump_json,
+        dest_basename=dest_basename,
+        file_extension='.json',
+    )
 
-    def decorator(func):
 
-        @functools.wraps(func)
-        def collect_and_dump(*args, **kwargs):
+def dump_text(dest_basename):
+    ''' Iterate over a generator function to dump the text lines it yields to a file. '''
+    return functools.partial(
+        _wrap_harvest_func_with_dump_func,
+        dump_func=run_and_dump_text,
+        dest_basename=dest_basename,
+        file_extension='.txt',
+    )
 
-            full_filename = dest_basename + time.strftime("%Y-%m-%d_%H:%M:%S") + ".json"
-            dump_path = os.path.join('data', full_filename)
 
-            with codecs.open(dump_path, 'w', encoding='utf8') as dump_file:
+def _wrap_harvest_func_with_dump_func(harvest_func, dump_func, dest_basename, file_extension):
 
-                dump_file.write('[\n')
-                first_record = True
+    @functools.wraps(harvest_func)
+    def harvest_and_dump(*args, **kwargs):
 
-                for value_list in func(*args, **kwargs):
-                    for record in value_list:
+        full_filename = dest_basename + time.strftime("%Y-%m-%d_%H:%M:%S") + file_extension
+        dump_path = os.path.join('data', full_filename)
 
-                        if not first_record:
-                            dump_file.write(',\n')
+        with codecs.open(dump_path, 'w', encoding='utf8') as dump_file:
+            dump_func(harvest_func, dump_file, *args, **kwargs)
 
-                        # Convert non-JSON data to JSON
-                        cleaned_record = {}
-                        for field, value in record.items():
-                            if isinstance(value, datetime):
-                                cleaned_record[field] = value.isoformat()
-                            else:
-                                cleaned_record[field] = value
+    return harvest_and_dump
 
-                        dump_file.write(json.dumps(cleaned_record))
-                        first_record = False
 
-                dump_file.write('\n]')
+def run_and_dump_text(harvest_func, dump_file, *args, **kwargs):
 
-        return collect_and_dump
+    for line_list in harvest_func(*args, **kwargs):
+        for line in line_list:
+            dump_file.write(line + '\n')
 
-    return decorator
+
+def run_and_dump_json(harvest_func, dump_file, *args, **kwargs):
+
+    dump_file.write('[\n')
+    first_record = True
+
+    for value_list in harvest_func(*args, **kwargs):
+        for record in value_list:
+
+            if not first_record:
+                dump_file.write(',\n')
+
+            # Convert non-JSON data to JSON
+            cleaned_record = {}
+            for field, value in record.items():
+                if isinstance(value, datetime):
+                    cleaned_record[field] = value.isoformat()
+                else:
+                    cleaned_record[field] = value
+
+            dump_file.write(json.dumps(cleaned_record))
+            first_record = False
+
+    dump_file.write('\n]')
