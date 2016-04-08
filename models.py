@@ -124,6 +124,10 @@ class Search(ProxyModel):
     result_count_on_page = IntegerField()
     estimated_results_count = IntegerField()
 
+    # An optional field for associating a search with a specific package.
+    # This should be specified whenever we need to trace a search to a related package.
+    package = TextField(index=True, null=True)
+
 
 class SearchResult(ProxyModel):
     ''' A result to a search query submitted to a search engine. '''
