@@ -33,10 +33,12 @@ def get_results_for_queries(queries, include_stack_overflow, search_id, api_key)
     fetch_index = last_fetch_index + 1
 
     for query in queries:
-        get_results(query, include_stack_overflow, fetch_index, search_id, api_key)
+        get_results(
+            query['query'], query['package'], include_stack_overflow,
+            fetch_index, search_id, api_key)
 
 
-def get_results(query, include_stack_overflow, fetch_index, search_id, api_key):
+def get_results(query, package, include_stack_overflow, fetch_index, search_id, api_key):
 
     # Make request for search results
     params = DEFAULT_PARAMS.copy()
@@ -65,7 +67,8 @@ def get_results(query, include_stack_overflow, fetch_index, search_id, api_key):
         requested_count=REQUESTED_RESULT_COUNT,
         result_count_on_page=entry_count,
         estimated_results_count=int(
-            soup.find('cse:searchinformation').find('cse:totalresults').text)
+            soup.find('cse:searchinformation').find('cse:totalresults').text),
+        package=package,
     )
 
     # Fetch the first "entry" or search result
@@ -111,6 +114,9 @@ def get_results(query, include_stack_overflow, fetch_index, search_id, api_key):
 @lock_method(LOCK_FILENAME)
 def main(queries, google_config, include_stack_overflow, *args, **kwargs):
 
+    with open(queries) as queries_file:
+        query_list = json.load(queries_file)
+
     with open(google_config) as google_config_file:
         config = json.load(google_config_file)
         search_id = config['search_id']
@@ -118,19 +124,23 @@ def main(queries, google_config, include_stack_overflow, *args, **kwargs):
 
     with open(queries) as queries_file:
         queries = [l.strip() for l in queries_file]
-        get_results_for_queries(queries, include_stack_overflow, search_id, api_key)
+        get_results_for_queries(query_list, include_stack_overflow, search_id, api_key)
 
 
 def configure_parser(parser):
 
     parser.description = "Fetch top search results for a set of packages"
-    parser.add_argument('queries', help="the name of a file containing a list of queries")
+    parser.add_argument(
+        'queries',
+        help="A JSON file of queries to search with.  This should be an array of JSON " +
+             "objects where each object has a 'package' key with the package name and " +
+             "a 'query' key with the query to make."
+    )
     parser.add_argument(
         'google_config',
         metavar='google-config',
         help="a file with keys to a Google APIs custom search engine"
     )
-
     # In case Stack Overflow dominates the search results, this flag
     # will allow the caller to query only for results that are not from Stack Overflow.
     parser.add_argument(
