@@ -7,10 +7,10 @@ projectdir: /home/{{ ansible_user }}/drive
 repo: https://github.com/andrewhead/Package-Qualifiers.git
 privatebucket: readme-fetcher
 postgres_config: postgres-config.json
-logfile: /var/log/{{ appname }}.log
 postgres_port: 5432
 postgres_version: 9.3
 venv: "{{ projectdir }}/venv"
 src: "{{ projectdir }}/src"
+logdir: "{{ projectdir }}/logs"
 code_data: "{{ projectdir }}/data"
 long_time: 31536000  # one year in seconds

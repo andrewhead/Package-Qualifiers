@@ -41,6 +41,10 @@
   file: state=directory path={{ code_data }} owner={{ ansible_ssh_user }} group={{ groupname }}
   become: true
 
+- name: Create log directory
+  file: state=directory path={{ logdir }} owner={{ ansible_ssh_user }} group={{ groupname }}
+  become: true
+
 - name: Install virtualenv
   pip: name=virtualenv
   become: true

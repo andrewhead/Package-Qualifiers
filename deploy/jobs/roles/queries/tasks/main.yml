@@ -4,4 +4,4 @@
 
 - name: Create semi-daily job to fetch queries
   cron: name="fetch queries" month="*" day="*" hour="*/12" minute="0" user={{ ansible_ssh_user }}
-    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch queries {{ code_data }}/seeds.txt --depth-level=3 --db postgres --db-config {{ src }}/{{ postgres_config }}"
+    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch queries {{ code_data }}/seeds.txt --depth-level=3 --db postgres --db-config {{ src }}/{{ postgres_config }} >> {{ logdir }}/queries.log 2>&1"

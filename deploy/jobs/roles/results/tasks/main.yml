@@ -10,4 +10,4 @@
 # The Google Custom Search quota resets at midnight.
 - name: Create semi-daily job to fetch search results
   cron: name="fetch search results" month="*" day="*" hour="1" minute="0" user={{ ansible_ssh_user }}
-    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch results {{ code_data }}/queries.json {{ src }}/google-credentials.json --db postgres --db-config {{ src }}/{{ postgres_config }}"
+    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch results {{ code_data }}/queries.json {{ src }}/google-credentials.json --db postgres --db-config {{ src }}/{{ postgres_config }} >> {{ logdir }}/results.log 2>&1"
