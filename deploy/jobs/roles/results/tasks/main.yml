@@ -1,27 +1,13 @@
 ---
 - name: Transfer list of queries
-  copy: src=queries.txt dest={{ code_data }}/queries.txt
+  copy: src=queries.json dest={{ code_data }}/queries.json
 
 - name: Fetch search engine credentials
   s3: bucket={{ privatebucket }} object=google-credentials.json dest={{ src }}/google-credentials.json mode=get
       aws_access_key={{ aws_access_key_id }} aws_secret_key={{ aws_secret_access_key }}
 
-- name: Launch job for fetching search results
-  command: >
-    {{ projectdir }}/venv/bin/python
-    {{ src }}/data.py
-    fetch
-    results
-    {{ code_data }}/queries.txt
-    {{ src }}/google-credentials.json
-    --db postgres
-    --db-config {{ src }}/{{ postgres_config }}
-  async: "{{ long_time }}"
-  poll: 0
-  register: fetcher_sleeper
-
-- name: Fail if job already exited.  If failure, this job may already be running.
-  async_status: jid={{ fetcher_sleeper.ansible_job_id }}
-  register: job_result
-  failed_when: job_result.finished
-  retries: 1
+# Start the query fetching at 1am every day so that the Google Search quota has reset
+# The Google Custom Search quota resets at midnight.
+- name: Create semi-daily job to fetch search results
+  cron: name="fetch search results" month="*" day="*" hour="1" minute="0" user={{ ansible_ssh_user }}
+    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch results {{ code_data }}/queries.json {{ src }}/google-credentials.json --db postgres --db-config {{ src }}/{{ postgres_config }}"
