@@ -89,7 +89,7 @@ def _save_record(url, record, fetch_index):
         try:
             length = int(record['length'])
         except ValueError:
-            logger.warn("Length '%s' is not an integer for URL %s", length, url)
+            logger.warn("Length '%s' is not an integer for URL %s", record['length'], url)
             length = None
 
         WebPageVersion.create(
