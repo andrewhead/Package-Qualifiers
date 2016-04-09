@@ -50,6 +50,9 @@ def get_results(query, package, include_stack_overflow, fetch_index, search_id, 
         params['siteSearchFilter'] = 'e'  # 'e' for 'exclude'
     response = make_request(default_requests_session.get, SEARCH_URL, params=params)
 
+    if response is None:
+        return
+
     # Parse search results
     soup = BeautifulSoup(response.content, 'html.parser')
     url = soup.find('opensearch:Url')
