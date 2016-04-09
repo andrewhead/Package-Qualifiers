@@ -178,7 +178,47 @@ class WebPageVersion(ProxyModel):
     # instead of some integer value
     status_code = TextField(index=True)
     digest = TextField(index=True)
-    length = IntegerField()
+    length = IntegerField(null=True)
+
+
+class QuestionSnapshot(ProxyModel):
+    '''
+    A snapshot of a Stack Overflow question at a moment when the API is queried.
+
+    This contains much of the same data as the "Post" model.
+    Though 'Snapshot' models come from periodic queries to the Stack Overflow API,
+    rather than from a one-time data dump.  This allows us to describe the longitudinal change
+    in Stack Overflow posts and data.
+    '''
+
+    # Fetch logistics
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    question_id = IntegerField(index=True)
+    owner_id = IntegerField(null=True)
+    comment_count = IntegerField()
+    delete_vote_count = IntegerField()
+    reopen_vote_count = IntegerField()
+    close_vote_count = IntegerField()
+    is_answered = BooleanField()
+    view_count = IntegerField()
+    favorite_count = IntegerField()
+    down_vote_count = IntegerField()
+    up_vote_count = IntegerField()
+    answer_count = IntegerField()
+    score = IntegerField()
+    last_activity_date = DateTimeField()
+    creation_date = DateTimeField()
+    title = TextField()
+    body = TextField()
+
+
+class QuestionSnapshotTag(ProxyModel):
+    ''' A link between one snapshot of a Stack Overflow question and one of its tags. '''
+    # Both IDs are indexed to allow fast lookup of question snapshot for a given tag and vice versa.
+    question_snapshot_id = IntegerField(index=True)
+    tag_id = IntegerField(index=True)
 
 
 class Post(ProxyModel):
@@ -388,6 +428,8 @@ def create_tables():
         SearchResult,
         SearchResultContent,
         WebPageVersion,
+        QuestionSnapshot,
+        QuestionSnapshotTag,
         Post,
         Tag,
         PostHistory,

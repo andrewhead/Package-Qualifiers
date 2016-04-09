@@ -83,6 +83,15 @@ def _save_record(url, record, fetch_index):
             timestamp=timestamp_datetime,
         )
     except WebPageVersion.DoesNotExist:
+
+        # In a few exceptional cases, I've found that the length has
+        # the value '-'.  We store a null length when we encounter '-'.
+        try:
+            length = int(record['length'])
+        except ValueError:
+            logger.warn("Length '%s' is not an integer for URL %s", length, url)
+            length = None
+
         WebPageVersion.create(
             fetch_index=fetch_index,
             url=url,
@@ -92,7 +101,7 @@ def _save_record(url, record, fetch_index):
             mime_type=record['mimetype'],
             status_code=record['statuscode'],
             digest=record['digest'],
-            length=record['length'],
+            length=length,
         )
 
 
