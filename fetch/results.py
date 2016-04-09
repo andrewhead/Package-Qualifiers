@@ -50,6 +50,10 @@ def get_results(query, package, include_stack_overflow, fetch_index, search_id, 
         params['siteSearchFilter'] = 'e'  # 'e' for 'exclude'
     response = make_request(default_requests_session.get, SEARCH_URL, params=params)
 
+    # Pause so that we don't bombard the server with requests
+    time.sleep(REQUEST_DELAY)
+
+    # If request resulted in error, the response is null.  Skip over this query.
     if response is None:
         return
 
@@ -109,9 +113,6 @@ def get_results(query, package, include_stack_overflow, fetch_index, search_id, 
         # in the order of decreasing relevance, such that rank increases (gets bigger)
         # with each successive entry visited.
         entry = entry.find_next('entry')
-
-    # Pause so that we don't bombard the server with requests
-    time.sleep(REQUEST_DELAY)
 
 
 @lock_method(LOCK_FILENAME)
