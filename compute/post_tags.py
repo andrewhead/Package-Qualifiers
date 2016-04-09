@@ -9,7 +9,7 @@ from models import BatchInserter
 from models import Post, Tag, PostTag
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 # Paginating with Peewee is very slow, as it requires counting up the entries
 # in the pages before for each new query for a page.  But we want to do some

@@ -7,7 +7,7 @@ from playhouse.migrate import migrate
 from peewee import TextField
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 
 def forward(migrator):

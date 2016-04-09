@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging
 import requests
+import logging
 import time
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 
 default_requests_session = requests.Session()
@@ -24,7 +24,7 @@ def make_request(method, *args, **kwargs):
     res = None
 
     def log_error(err_msg):
-        logging.warn(
+        logger.warn(
             "Error (%s) For API call %s, Args: %s, Kwargs: %s",
             str(err_msg), str(method), str(args), str(kwargs)
         )
@@ -43,7 +43,7 @@ def make_request(method, *args, **kwargs):
             log_error("ReadTimeout")
 
         if try_again:
-            logging.warn("Waiting %d seconds for before retrying.", int(RETRY_DELAY))
+            logger.warn("Waiting %d seconds for before retrying.", int(RETRY_DELAY))
             time.sleep(RETRY_DELAY)
             attempts += 1
 

@@ -8,7 +8,7 @@ import sys
 import os.path
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 TASK_PARSER_JAR = "task-parser-jar-with-dependencies.jar"
 TASK_PARSER_BUCKET_URL = "https://s3-us-west-2.amazonaws.com/package-qualifiers-public/"
 MODULE_DIRECTORY = '/'.join(__name__.split('.')[:-1])
@@ -18,7 +18,7 @@ def main(db_config, *args, **kwargs):
 
     # Fetch the JAR for task extraction, but only if it has been updated (-N flag)
     jar_url = TASK_PARSER_BUCKET_URL + TASK_PARSER_JAR
-    logging.info("Downloading the task extractor from: %s", jar_url)
+    logger.info("Downloading the task extractor from: %s", jar_url)
     subprocess.call(['wget', '-N', jar_url, '-P', MODULE_DIRECTORY], stdout=sys.stdout)
 
     # Launch the task extractor

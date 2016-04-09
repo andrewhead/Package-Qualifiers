@@ -5,6 +5,18 @@ from __future__ import unicode_literals
 import logging
 import argparse
 
+# Set up logger for the sub-commands to use.
+# Note that this setup must occur before the other modules are imported.
+# Code stub courtesy of http://stackoverflow.com/questions/7621897/python-logging-module-globally
+log_formatter = logging.Formatter(
+    fmt="[%(levelname)s] %(asctime)s (%(module)s:%(lineno)d): %(message)s")
+log_handler = logging.StreamHandler()
+log_handler.setFormatter(log_formatter)
+data_logger = logging.getLogger('data')
+data_logger.setLevel(logging.INFO)
+data_logger.addHandler(log_handler)
+data_logger.propagate = False
+
 from models import create_tables, init_database
 from fetch import queries, results, results_content, histories
 from import_ import stackoverflow
@@ -13,7 +25,6 @@ from migrate import run_migration
 from dump import node_post_stats, popular_tag_post_stats, package_top_queries
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 COMMANDS = {
     'fetch': {
         'description': "Fetch data from the web.",

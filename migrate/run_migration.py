@@ -12,7 +12,7 @@ from playhouse.migrate import PostgresqlMigrator, SqliteMigrator
 from models import db_proxy
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 path_to_migrations = '.'.join(__name__.split('.')[:-1])
 
 
@@ -24,7 +24,7 @@ def main(migration_name, db, *args, **kwargs):
     elif db == 'postgres':
         migrator = PostgresqlMigrator(db_proxy)
     else:
-        logging.error("Could not find appropriate migrator for the database.")
+        logger.error("Could not find appropriate migrator for the database.")
         return
 
     # Import migration module and run forward migration

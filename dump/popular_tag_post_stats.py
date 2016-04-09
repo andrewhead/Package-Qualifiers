@@ -10,7 +10,7 @@ from dump import dump_json
 from models import Post, Tag, PostTag
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 TAGS = [
     "javascript",
     "java",

@@ -12,7 +12,7 @@ from models import BatchInserter
 from models import Post, Tag, PostHistory, PostLink, Vote, Comment, Badge, User
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 # This is a map from names of data types to the models they correspond to.
 # To enable importing a new type of data, one should define a new model

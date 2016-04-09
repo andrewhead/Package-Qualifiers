@@ -10,7 +10,7 @@ from fetch.api import make_request, default_requests_session
 from models import Search, SearchResult, SearchResultContent
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 DELAY_TIME = 0.5
 
 
@@ -42,7 +42,7 @@ def get_results_content(fetch_all, fetch_indexes):
         if hasattr(resp, 'content'):
             SearchResultContent.create(search_result=search_result, content=resp.content)
         else:
-            logging.warn("Error fetching content from URL: %s", search_result.url)
+            logger.warn("Error fetching content from URL: %s", search_result.url)
 
         # Even though most of the pages will be from different domains, we pause between
         # fetching the content for each result to avoid spamming any specific domain with requests.

@@ -10,7 +10,7 @@ from dump import dump_json
 from models import Query, Seed
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 
 @dump_json(__name__)

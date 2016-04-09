@@ -13,7 +13,7 @@ from models import Query, Seed
 from lock import lock_method
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 
 # Query URL and parameters from http://stackoverflow.com/questions/5102878/google-suggest-api

@@ -10,7 +10,7 @@ from peewee import Model, SqliteDatabase, Proxy, PostgresqlDatabase, \
     CharField, IntegerField, ForeignKeyField, DateTimeField, TextField, BooleanField
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 POSTGRES_CONFIG_NAME = 'postgres-credentials.json'
 DATABASE_NAME = 'fetcher'

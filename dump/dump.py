@@ -11,7 +11,7 @@ import time
 import os.path
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 
 
 '''

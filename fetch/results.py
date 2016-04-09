@@ -15,7 +15,7 @@ from lock import lock_method
 from models import Search, SearchResult
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 SEARCH_URL = 'https://www.googleapis.com/customsearch/v1'
 REQUESTED_RESULT_COUNT = 10
 DEFAULT_PARAMS = {

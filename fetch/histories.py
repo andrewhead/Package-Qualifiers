@@ -12,7 +12,7 @@ from lock import lock_method
 from models import SearchResult, WebPageVersion
 
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger('data')
 ARCHIVE_URL = 'http://web.archive.org/cdx/search/cdx'
 DEFAULT_PARAMS = {
     'limit': 50,  # default page size for CDX pagination
