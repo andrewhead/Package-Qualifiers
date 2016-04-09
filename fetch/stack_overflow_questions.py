@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import logging
 import time
 from peewee import fn
+import datetime
 
 from fetch.api import make_request, default_requests_session
 from models import QuestionSnapshot, Tag, QuestionSnapshotTag
@@ -32,6 +33,14 @@ def _save_question(question, fetch_index):
         if 'owner' in question and 'user_id' in question['owner']\
         else None
 
+    # Dates are returned by the Stack Exchange API in Unix epoch time.
+    # This inline method converts the timestamps to datetime objects that
+    # can be stored in a Postgres database.  Note that the times will be
+    # converted to _local times_ on this server rather than their original
+    # UTC times.  I chose to do this as the date of creation of these records
+    # will also be in local time.
+    timestamp_to_datetime = lambda ts: datetime.datetime.fromtimestamp(ts)
+
     # Create a snapshot of this question
     snapshot = QuestionSnapshot.create(
         fetch_index=fetch_index,
@@ -48,8 +57,8 @@ def _save_question(question, fetch_index):
         up_vote_count=question['up_vote_count'],
         answer_count=question['answer_count'],
         score=question['score'],
-        last_activity_date=question['last_activity_date'],
-        creation_date=question['creation_date'],
+        last_activity_date=timestamp_to_datetime(question['last_activity_date']),
+        creation_date=timestamp_to_datetime(question['creation_date']),
         title=question['title'],
         body=question['body'],
     )
