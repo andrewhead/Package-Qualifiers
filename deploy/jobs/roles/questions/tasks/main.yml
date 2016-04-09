@@ -1,0 +1,9 @@
+---
+- name: Transfer list of tags
+  copy: src=tags.txt dest={{ code_data }}/tags.txt
+
+# We run this job semi-daily, once at 9AM and once at 9PM.  We do this to offset it from
+# the job of fetching automomplete queries, which usually finishes around 8AM and 8PM.
+- name: Create semi-daily job to fetch Stack Overflow questions
+  cron: name="fetch Stack Overflow questions" month="*" day="*" hour="9-23/12" minute="0" user={{ ansible_ssh_user }}
+    job="{{ projectdir }}/venv/bin/python {{ src }}/data.py fetch stack_overflow_questions {{ code_data }}/tags.txt --db postgres --db-config {{ src }}/{{ postgres_config }} >> {{ logdir }}/questions.log 2>&1"
