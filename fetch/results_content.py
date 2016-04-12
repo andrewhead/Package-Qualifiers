@@ -7,7 +7,7 @@ import time
 from peewee import JOIN_LEFT_OUTER
 
 from fetch.api import make_request, default_requests_session
-from models import Search, SearchResult, SearchResultContent
+from models import Search, SearchResult, WebPageContent, SearchResultContent
 
 
 logger = logging.getLogger('data')
@@ -54,11 +54,14 @@ def get_results_content(fetch_all, fetch_indexes, share_content):
         # Fetch content for the search result
         resp = make_request(default_requests_session.get, search_result.url)
 
-        # Save the content
+        # Associate the scraped content to a URL
         if hasattr(resp, 'content'):
-            SearchResultContent.create(search_result=search_result, content=resp.content)
+            # To avoid redundant storage, we create a record for web page
+            # contents that can be shared across multiple URLs.
+            web_page_content = WebPageContent.create(url=search_result.url, content=resp.content)
+            SearchResultContent.create(search_result=search_result, content=web_page_content)
             previous_url = search_result.url
-            previous_content = resp.content
+            previous_content = web_page_content
         else:
             logger.warn("Error fetching content from URL: %s", search_result.url)
 
@@ -67,8 +70,8 @@ def get_results_content(fetch_all, fetch_indexes, share_content):
         time.sleep(DELAY_TIME)
 
 
-def main(fetch_all, fetch_indexes, share_content, *args, **kwargs):
-    get_results_content(fetch_all, fetch_indexes, share_content)
+def main(fetch_all, fetch_indexes, no_share_content, *args, **kwargs):
+    get_results_content(fetch_all, fetch_indexes, (not no_share_content))
 
 
 def configure_parser(parser):
@@ -87,7 +90,10 @@ def configure_parser(parser):
         help="fetch contents for records with the specified fetch indexes"
     )
     parser.add_argument(
-        '--share-content',
+        '--no-share-content',
         action='store_true',
-        help="only fetch contents once for each distinct URL in the fetch set."
+        help="By default, this program only fetch contents once for each distinct URL in " +
+             "the fetch set.  This is to avoid unnecessary fetches and speed up the " +
+             "program.  If you set this flag, then this script will fetch each URL anew " +
+             "each time that it appears in a search result."
     )

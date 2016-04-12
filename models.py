@@ -141,12 +141,19 @@ class SearchResult(ProxyModel):
     rank = IntegerField()
 
 
-class SearchResultContent(ProxyModel):
-    ''' Webpage content at a search results URL. '''
+class WebPageContent(ProxyModel):
+    ''' The contents at a web URL at a point in time. '''
 
     date = DateTimeField(index=True, default=datetime.datetime.now)
-    search_result = ForeignKeyField(SearchResult, related_name='content')
+    url = TextField(index=True)
     content = TextField()
+
+
+class SearchResultContent(ProxyModel):
+    ''' A link from search results to the content at the result's URL. '''
+
+    search_result = ForeignKeyField(SearchResult)
+    content = ForeignKeyField(WebPageContent)
 
 
 class WebPageVersion(ProxyModel):
@@ -426,6 +433,7 @@ def create_tables():
         Seed,
         Search,
         SearchResult,
+        WebPageContent,
         SearchResultContent,
         WebPageVersion,
         QuestionSnapshot,
