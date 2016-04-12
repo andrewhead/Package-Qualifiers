@@ -14,26 +14,42 @@ logger = logging.getLogger('data')
 DELAY_TIME = 0.5
 
 
-def get_results_content(fetch_all, fetch_indexes):
+def get_results_content(fetch_all, fetch_indexes, share_content):
 
+    # We order search results by URL so that we can visit search results that share the
+    # same URL one after the other.  This way we can associate the same fetched contents
+    # with all search results that share a URL at the same time.
+    results = (
+        SearchResult
+        .select()
+        .order_by(SearchResult.url)
+    )
     if fetch_all:
-        results = SearchResult.select()
+        results = results
     elif fetch_indexes:
         results = (
-            SearchResult
-            .select()
+            results
             .join(Search)
             .where(Search.fetch_index << fetch_indexes)
         )
     else:
         results = (
-            SearchResult
-            .select()
+            results
             .join(SearchResultContent, JOIN_LEFT_OUTER)
             .where(SearchResultContent.content >> None)
-            )
+        )
+
+    previous_url = None
+    previous_content = None
 
     for search_result in results:
+
+        # If the caller has specified that we should share fetched contents between
+        # search results with the same URL, then check to see if the URL stays the same.
+        if share_content and search_result.url == previous_url:
+            logger.debug("Already have content for URL %s.  Reusing.", search_result.url)
+            SearchResultContent.create(search_result=search_result, content=previous_content)
+            continue
 
         # Fetch content for the search result
         resp = make_request(default_requests_session.get, search_result.url)
@@ -41,6 +57,8 @@ def get_results_content(fetch_all, fetch_indexes):
         # Save the content
         if hasattr(resp, 'content'):
             SearchResultContent.create(search_result=search_result, content=resp.content)
+            previous_url = search_result.url
+            previous_content = resp.content
         else:
             logger.warn("Error fetching content from URL: %s", search_result.url)
 
@@ -49,8 +67,8 @@ def get_results_content(fetch_all, fetch_indexes):
         time.sleep(DELAY_TIME)
 
 
-def main(fetch_all, fetch_indexes, *args, **kwargs):
-    get_results_content(fetch_all, fetch_indexes)
+def main(fetch_all, fetch_indexes, share_content, *args, **kwargs):
+    get_results_content(fetch_all, fetch_indexes, share_content)
 
 
 def configure_parser(parser):
@@ -67,4 +85,9 @@ def configure_parser(parser):
         type=int,
         nargs='+',
         help="fetch contents for records with the specified fetch indexes"
+    )
+    parser.add_argument(
+        '--share-content',
+        action='store_true',
+        help="only fetch contents once for each distinct URL in the fetch set."
     )
