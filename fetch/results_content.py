@@ -45,10 +45,11 @@ def get_results_content(fetch_all, fetch_indexes, share_content):
     for search_result in results:
 
         # If the caller has specified that we should share fetched contents between
-        # search results with the same URL, then check to see if the URL stays the same.
+        # search results with the same URL, then check to see if the URL has stayed the same.
         if share_content and search_result.url == previous_url:
-            logger.debug("Already have content for URL %s.  Reusing.", search_result.url)
-            SearchResultContent.create(search_result=search_result, content=previous_content)
+            logger.debug("Already called URL %s.  Reusing its response.", search_result.url)
+            if previous_content is not None:
+                SearchResultContent.create(search_result=search_result, content=previous_content)
             continue
 
         # Fetch content for the search result
@@ -62,10 +63,13 @@ def get_results_content(fetch_all, fetch_indexes, share_content):
             # if we want to successfully store the responses from all URLs.
             web_page_content = WebPageContent.create(url=search_result.url, content=resp.text)
             SearchResultContent.create(search_result=search_result, content=web_page_content)
-            previous_url = search_result.url
             previous_content = web_page_content
         else:
             logger.warn("Error fetching content from URL: %s", search_result.url)
+            previous_content = None
+
+        # With either a successful or failed response, save that we queried this URL
+        previous_url = search_result.url
 
         # Even though most of the pages will be from different domains, we pause between
         # fetching the content for each result to avoid spamming any specific domain with requests.
