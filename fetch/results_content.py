@@ -58,7 +58,9 @@ def get_results_content(fetch_all, fetch_indexes, share_content):
         if hasattr(resp, 'content'):
             # To avoid redundant storage, we create a record for web page
             # contents that can be shared across multiple URLs.
-            web_page_content = WebPageContent.create(url=search_result.url, content=resp.content)
+            # As it turns out, we want "response.text" (Unicode) and not "response.content" (bytes),
+            # if we want to successfully store the responses from all URLs.
+            web_page_content = WebPageContent.create(url=search_result.url, content=resp.text)
             SearchResultContent.create(search_result=search_result, content=web_page_content)
             previous_url = search_result.url
             previous_content = web_page_content
