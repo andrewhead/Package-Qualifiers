@@ -71,10 +71,14 @@ def get_history(url, fetch_index):
 def _save_record(url, record, fetch_index):
 
     # Convert string for the timestamp into a proper datetime object
-    timestamp_datetime = datetime.datetime.strptime(
-        record['timestamp'],
-        '%Y%m%d%H%M%S',
-    )
+    try:
+        timestamp_datetime = datetime.datetime.strptime(
+            record['timestamp'],
+            '%Y%m%d%H%M%S',
+        )
+    except ValueError:
+        logger.warn("Invalid timestamp '%s' for URL %s.  Skipping record", record['timestamp'], url)
+        return
 
     # We'll create a new record for the version only if it doesn't yet exist.
     try:
