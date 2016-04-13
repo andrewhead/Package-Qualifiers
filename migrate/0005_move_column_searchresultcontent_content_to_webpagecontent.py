@@ -43,9 +43,14 @@ def forward(migrator):
             date=record['date'],
             url=record['url'],
         )
+        # Normally, it's not recommended to directly insert values into queries.  But I do
+        # it here because I think Postgres and SQLite have two different interpolating strings,
+        # so this is one way to write the migration to make it more portable.
+        # I also think there is no risk that either of these fields that I insert will
+        # be anything other than an integer.
         SearchResultContent.raw(
-            "UPDATE searchresultcontent SET webpagecontent_id = ? WHERE id = ?",
-            web_page_content.id, record['id']
+            "UPDATE searchresultcontent SET webpagecontent_id = " + str(web_page_content.id) + 
+            "WHERE id = " + str(record['id']),
         ).execute()
 
     # Drop unnecessary columns from SearchResultContent model
