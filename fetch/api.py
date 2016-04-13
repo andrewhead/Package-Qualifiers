@@ -17,8 +17,12 @@ default_requests_session.headers['User-Agent'] =\
 
 def make_request(method, *args, **kwargs):
 
-    MAX_ATTEMPTS = 5
-    RETRY_DELAY = 30
+    # We read the max_attempts and retry_delay arguments from the kwargs dictionary
+    # instead of named kwargs because we want to preserve the order of the
+    # "request" method's positional arguments for clients of this method.
+    max_attempts = kwargs.get('max_attempts', 2)
+    retry_delay = kwargs.get('retry_delay', 10)
+
     try_again = True
     attempts = 0
     res = None
@@ -29,7 +33,7 @@ def make_request(method, *args, **kwargs):
             str(err_msg), str(method), str(args), str(kwargs)
         )
 
-    while try_again and attempts < MAX_ATTEMPTS:
+    while try_again and attempts < max_attempts:
 
         try:
             res = method(*args, **kwargs)
@@ -43,8 +47,8 @@ def make_request(method, *args, **kwargs):
             log_error("ReadTimeout")
 
         if try_again:
-            logger.warn("Waiting %d seconds for before retrying.", int(RETRY_DELAY))
-            time.sleep(RETRY_DELAY)
+            logger.warn("Waiting %d seconds for before retrying.", int(retry_delay))
+            time.sleep(retry_delay)
             attempts += 1
 
     return res
