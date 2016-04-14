@@ -136,7 +136,7 @@ class SearchResult(ProxyModel):
     title = TextField()
     snippet = TextField(null=True)
     link = CharField()
-    url = CharField()
+    url = CharField(index=True)
     updated_date = DateTimeField()
     rank = IntegerField()
 
