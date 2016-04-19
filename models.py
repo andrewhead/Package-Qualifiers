@@ -156,6 +156,17 @@ class SearchResultContent(ProxyModel):
     content = ForeignKeyField(WebPageContent)
 
 
+class Code(ProxyModel):
+    ''' A snippet of code found on a web page. '''
+
+    # These fields signify when the snippet was extracted
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+    compute_index = IntegerField(index=True)
+
+    web_page = ForeignKeyField(WebPageContent)
+    code = TextField()
+
+
 class WebPageVersion(ProxyModel):
     '''
     A version of a web page at a URL as indexed by the Internet Archive.
@@ -434,6 +445,7 @@ def create_tables():
         Search,
         SearchResult,
         WebPageContent,
+        Code,
         SearchResultContent,
         WebPageVersion,
         QuestionSnapshot,

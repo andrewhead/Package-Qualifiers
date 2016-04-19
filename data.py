@@ -4,6 +4,8 @@
 from __future__ import unicode_literals
 import logging
 import argparse
+import unittest
+import os
 
 # Set up logger for the sub-commands to use.
 # Note that this setup must occur before the other modules are imported.
@@ -20,7 +22,7 @@ data_logger.propagate = False
 from models import create_tables, init_database
 from fetch import queries, results, results_content, histories, stack_overflow_questions
 from import_ import stackoverflow
-from compute import post_tags, tasks
+from compute import code, post_tags, tasks
 from migrate import run_migration
 from dump import node_post_stats, popular_tag_post_stats, package_top_queries
 
@@ -39,7 +41,7 @@ COMMANDS = {
     'compute': {
         'description': "Compute derived fields from existing data.",
         'module_help': "Type of data to compute.",
-        'modules': [post_tags, tasks],
+        'modules': [code, post_tags, tasks],
     },
     'migrate': {
         'description':
@@ -56,10 +58,15 @@ COMMANDS = {
 }
 
 
+def run_tests(*args, **kwargs):
+    suite = unittest.defaultTestLoader.discover(os.getcwd())
+    unittest.TextTestRunner().run(suite)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Manage data for software packages.")
-    subparsers = parser.add_subparsers(help="Sub-commands for managing data")
+    subparsers = parser.add_subparsers(help="Sub-commands for managing data", dest='command')
 
     for command in COMMANDS.keys():
 
@@ -90,12 +97,17 @@ if __name__ == '__main__':
             module.configure_parser(module_parser)
             module_parser.set_defaults(func=module.main)
 
+    # Add command for running unit tests
+    test_parser = subparsers.add_parser('tests', description="Run unit tests.")
+    test_parser.set_defaults(func=run_tests)
+
     # Parse arguments
     args = parser.parse_args()
 
     # Initialize database
-    init_database(args.db, config_filename=args.db_config)
-    create_tables()
+    if args.command != 'tests':
+        init_database(args.db, config_filename=args.db_config)
+        create_tables()
 
     # Invoke the main program that was specified by the submodule
     if args.func is not None:

@@ -131,6 +131,16 @@ See the options in the examples for fetching queries.
 
 # Contributing
 
+## Writing and running tests
+
+There is currently a small number of tests covering a portion of commands.
+As you develop, anything that's functionally more complex than an iterator should ideally have a unit test.
+Tests should be written and saved in the `tests` directory.
+
+You can check that the tests pass with this command:
+
+    python data.py tests
+
 ## Structure of a fetching or importing module
 
 A module for fetching or importing a specific type of data should have, at the least:
