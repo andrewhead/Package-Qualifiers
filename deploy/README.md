@@ -1,28 +1,36 @@
-# Notes
+# Deploying this Project
 
-## Usage
+## Deploying to an Ubuntu machine
 
 To deploy this project to an Ubuntu machine, run:
 
     ./deploy
 
-To run individual jobs, use the `runjob` utility:
+To see the available tags, type `./deploy --tags=help`.
+
+## Running jobs
+
+To set up `cron` jobs for fetching data, use the `runjob` utility:
 
     ./runjob queries
 
-for example, will run the job that fetches typical queries for packages.
-If your run `./runjob`, you can see a list of the available jobs.
+The above example will configure the job that fetches typical queries for packages.
+If your run `./runjob` without an argument, you can see a list of the available jobs.
 
-## Setup
+## Configuring your deploy machine
 
 The `deploy` script requires Ansible version 2.0 or above.
 Run `pip install -U ansible` to get the latest version.
 
-The `deploy` script sets up credentials for database login.
-You will need two sets of credentials to enable database login---`aws-credentials.json` and `postgres-credentials.json`.
-Both of these files should be placed in the same directory as this `README`.
+The `deploy` script sets up credentials for database login, and accesses them from S3.
+You will need three sets of credentials locally.
+These files are:
+* `aws-credentials.json`
+* `fetcher-postgres-credentials.json`
+* `reader-postgres-credentials.json`
 
-First, make an `aws-credentials.json` file with your Amazon Web Services credentials.
+All of these files should be placed in the same directory as this `README`.
+You must write the `aws-credentials.json` file by hand to reflect your Amazon Web Services credentials.
 This JSON file should have these contents, substituting in your own credentials:
 
     {
@@ -30,9 +38,9 @@ This JSON file should have these contents, substituting in your own credentials:
         "aws_secret_access_key": <secret-access-key>
     }
 
-Also, download the `postgres-credentials.json` file from S3 storage.
-This will let you deploy jobs that require access to the remote Postgres database.
-Ask the project maintainer for access to this file.
+You can find the `fetcher-pg-credentials.json` and `reader-pg-credentials.json` files on S3 storage.
+Ask the project maintainer for access to these files.
+These are required to configure the database with the default users and privileges.
 
 ## Data Security
 

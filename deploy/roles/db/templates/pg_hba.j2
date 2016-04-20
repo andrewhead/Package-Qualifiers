@@ -99,4 +99,5 @@ host    all             all             ::1/128                 md5
 #host    replication     postgres        ::1/128                 md5
 
 # Andrew Head <andrewhead@eecs.berkeley.edu> added these lines for remote login
-host    {{ appname }}	{{ dbusername }}	0.0.0.0/0	md5
+host    {{ appname }}	{{ fetcher_username }}	0.0.0.0/0	md5
+host    {{ appname }}	{{ reader_username }}	0.0.0.0/0	md5
