@@ -37,15 +37,17 @@ class CodeExtractor(object):
 
         # Attempt to parse content for a code node as JavaScript.
         # Mark the content as a code snippet if it is parsed successfully.
+        # Skip nodes with nothing but whitespace content.
         if type(node) is Tag and node.name in self.TAGS:
-            try:
-                js_parser = JavaScriptParser()
-                js_parser.parse(node.text)
-            except (SyntaxError, TypeError, AttributeError):
-                logging.debug("Code content could not be parsed as JavaScript.")
-            else:
-                node_code = node.text
-                code_snippets.append(node_code)
+            if node.text.strip() != '':
+                try:
+                    js_parser = JavaScriptParser()
+                    js_parser.parse(node.text)
+                except (SyntaxError, TypeError, AttributeError):
+                    logging.debug("Code content could not be parsed as JavaScript.")
+                else:
+                    node_code = node.text
+                    code_snippets.append(node_code)
 
         # If this node did not contain valid code, then visit all children
         # and check them for code.

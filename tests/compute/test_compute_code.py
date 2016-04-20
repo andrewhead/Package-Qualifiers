@@ -76,6 +76,11 @@ class ExtractCodeTest(unittest.TestCase):
         snippets = self.code_extractor.extract(document)
         self.assertEqual(len(snippets), 0)
 
+    def test_skip_whitespace_only(self):
+        document = self._make_document_with_body("<code>\t \n</code>")
+        snippets = self.code_extractor.extract(document)
+        self.assertEqual(len(snippets), 0)
+
     # In practice I don't expect the next two scenarios to come up.  But the expected behavior of
     # the code extractor is to scan children of all nodes that are marked as invalid.  This
     # test makes sure that functionality is correct.
