@@ -24,14 +24,14 @@ from fetch import queries, results, results_content, histories, stack_overflow_q
 from import_ import stackoverflow
 from compute import code, post_tags, python_snippets, tasks
 from migrate import run_migration
-from dump import node_post_stats, popular_tag_post_stats, package_top_queries
+from dump import node_post_stats, package_top_queries, pattern_snippets, popular_tag_post_stats
 
 
 COMMANDS = {
     'fetch': {
         'description': "Fetch data from the web.",
         'module_help': "Type of data to fetch.",
-        'modules': [queries, results, results_content, histories, stack_overflow_questions],
+        'modules': [histories, queries, results, results_content, stack_overflow_questions],
     },
     'import': {
         'description': "Import data from a local data source.",
@@ -53,7 +53,7 @@ COMMANDS = {
     'dump': {
         'description': "Dump data to a JSON file.",
         'module_help': "Type of data to dump.",
-        'modules': [node_post_stats, popular_tag_post_stats, package_top_queries],
+        'modules': [node_post_stats, pattern_snippets, package_top_queries, popular_tag_post_stats],
     },
 }
 
