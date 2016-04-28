@@ -381,6 +381,20 @@ class PostTag(ProxyModel):
     tag_id = IntegerField(index=True)
 
 
+class SnippetPattern(ProxyModel):
+    ''' A regular expression pattern describing a rule for detecting a snippet. '''
+    pattern = TextField(index=True)
+
+
+class PostSnippet(ProxyModel):
+    ''' A snippet of code found in a Stack Overflow post. '''
+    compute_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+    post = ForeignKeyField(Post)
+    pattern = ForeignKeyField(SnippetPattern)
+    snippet = TextField()
+
+
 class Task(ProxyModel):
     ''' A task that describes what you can do with a software package. '''
     compute_index = IntegerField()
@@ -459,6 +473,8 @@ def create_tables():
         Badge,
         User,
         PostTag,
+        SnippetPattern,
+        PostSnippet,
         Task,
         TaskNoun,
         TaskVerb,
