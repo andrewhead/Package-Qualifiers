@@ -44,7 +44,7 @@ class CodeExtractor(object):
                     js_parser = JavaScriptParser()
                     js_parser.parse(node.text)
                 except (SyntaxError, TypeError, AttributeError):
-                    logging.debug("Code content could not be parsed as JavaScript.")
+                    logger.debug("Code content could not be parsed as JavaScript.")
                 else:
                     node_code = node.text
                     code_snippets.append(node_code)
