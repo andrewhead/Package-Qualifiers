@@ -171,3 +171,12 @@ We're only supporting forward migrations for now.
 To add a script for dumping a certain type of data, decorate the `main` function of your module with `dump_json` from the `dump` module.
 This decorator takes one argument: the basename of a file to save in the `data/` directory.
 The `main` should do some queries to the database, and `yield` lists of records that will be saved as JSON.
+
+## Logging messages
+
+Every file you write should include this line after the imports and before any logic:
+
+    logger = logging.getLogger('data')
+
+All logging should be performed through `logger`, instead of using the `logging` module directly.
+Sticking to this convention lets us configure logging globally without touching any other loggers.
