@@ -22,7 +22,7 @@ data_logger.propagate = False
 from models import create_tables, init_database
 from fetch import queries, results, results_content, histories, stack_overflow_questions
 from import_ import stackoverflow
-from compute import code, post_tags, python_snippets, tasks
+from compute import code, npm_packages, post_tags, python_snippets, tasks
 from migrate import run_migration
 from dump import node_post_stats, package_top_queries, pattern_snippets, popular_tag_post_stats
 
@@ -41,7 +41,7 @@ COMMANDS = {
     'compute': {
         'description': "Compute derived fields from existing data.",
         'module_help': "Type of data to compute.",
-        'modules': [code, post_tags, python_snippets, tasks],
+        'modules': [code, npm_packages, post_tags, python_snippets, tasks],
     },
     'migrate': {
         'description':

@@ -18,8 +18,6 @@ logger = logging.getLogger('data')
 
 def extract_snippets(patterns, tags, compute_index, lines_of_context, show_progress=False):
 
-    print patterns
-
     # Fetch all posts, filtering by those for which tags have been specified
     posts = Post.select(Post.id, Post.body)
     if tags is not None:

@@ -395,6 +395,14 @@ class PostSnippet(ProxyModel):
     snippet = TextField()
 
 
+class PostNpmInstallPackage(ProxyModel):
+    ''' A package referenced in an 'npm install' command in a Stack Overflow post. '''
+    compute_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+    post = ForeignKeyField(Post)
+    package = TextField()
+
+
 class Task(ProxyModel):
     ''' A task that describes what you can do with a software package. '''
     compute_index = IntegerField()
@@ -475,6 +483,7 @@ def create_tables():
         PostTag,
         SnippetPattern,
         PostSnippet,
+        PostNpmInstallPackage,
         Task,
         TaskNoun,
         TaskVerb,
