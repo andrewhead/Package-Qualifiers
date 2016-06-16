@@ -434,6 +434,71 @@ class TaskNoun(ProxyModel):
     noun = ForeignKeyField(Noun, index=True)
 
 
+class GitHubProject(ProxyModel):
+    ''' A project on GitHub. '''
+
+    # Fetch logistics
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    # These identifiers identify the project from different contexts.
+    # 'name' will give the name of a package that has a GitHub project.
+    # 'owner' and 'repo' uniquely identify a GitHub project and provide
+    # the URL through which we reach it in the API.
+    name = TextField(index=True)
+    owner = TextField()
+    repo = TextField()
+
+
+class Issue(ProxyModel):
+    '''
+    An issue for a GitHub project.
+    The 'body' field is nullable as we found during our initial fetch that some
+    of the issues data contained 'null' bodies.
+    '''
+
+    # Fetch logistics
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    github_id = IntegerField()
+    project = ForeignKeyField(GitHubProject)
+
+    # Fields from the GitHub API
+    number = IntegerField()
+    created_at = DateTimeField(index=True)
+    updated_at = DateTimeField(index=True)
+    closed_at = DateTimeField(index=True, null=True)
+    state = TextField()
+    body = TextField(null=True)
+    comments = IntegerField()
+
+
+class IssueEvent(ProxyModel):
+    ''' An event (e.g., "closed") for an issue for a GitHub project. '''
+
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    github_id = IntegerField()
+    issue = ForeignKeyField(Issue)
+    created_at = DateTimeField(index=True)
+    event = TextField()
+
+
+class IssueComment(ProxyModel):
+    ''' A comment on a GitHub issue. '''
+
+    fetch_index = IntegerField()
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    github_id = IntegerField()
+    issue = ForeignKeyField(Issue)
+    created_at = DateTimeField(index=True)
+    updated_at = DateTimeField(index=True)
+    body = TextField()
+
+
 def init_database(db_type, config_filename=None):
 
     if db_type == 'postgres':
@@ -489,4 +554,8 @@ def create_tables():
         TaskVerb,
         Noun,
         Verb,
+        GitHubProject,
+        Issue,
+        IssueComment,
+        IssueEvent,
     ], safe=True)

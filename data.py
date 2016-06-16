@@ -20,7 +20,8 @@ data_logger.addHandler(log_handler)
 data_logger.propagate = False
 
 from models import create_tables, init_database
-from fetch import queries, results, results_content, histories, stack_overflow_questions
+from fetch import queries, results, results_content, histories, stack_overflow_questions, issues,\
+    issue_comments, issue_events
 from import_ import stackoverflow
 from compute import code, npm_packages, post_tags, python_snippets, tasks
 from migrate import run_migration
@@ -31,7 +32,10 @@ COMMANDS = {
     'fetch': {
         'description': "Fetch data from the web.",
         'module_help': "Type of data to fetch.",
-        'modules': [histories, queries, results, results_content, stack_overflow_questions],
+        'modules': [
+            histories, queries, results, results_content, stack_overflow_questions, issues,
+            issue_comments, issue_events,
+        ],
     },
     'import': {
         'description': "Import data from a local data source.",

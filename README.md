@@ -62,6 +62,31 @@ You can also do this:
 To fetch the content for all search results retrieved so far.
 This could be helpful if you want to retrieve contents for search results more than once.
 
+### Fetch GitHub issues
+
+To download the issues for a set of GitHub projects, run:
+
+    python data.py fetch issues project-repositories.json
+
+The `project-repositories.json` file is a JSON file with a list of objects.
+Each object in this file is of the form:
+
+    { "name": "<project_name>", "owner": "<repository_owner>", "repo": "<repository_name>" }
+
+The `name` provides a unique identifier for referring to the project (e.g., a Node.js package name).
+The `owner` and `repo` are used to look up the repository using the GitHub API.
+
+To fetch all comments for the latest set of fetched issues, run:
+
+    python data.py fetch issue_comments
+
+and to fetch all events associated with the latest set of fetched issues, run:
+
+    python data.py fetch issue_events
+
+It's not necessary to specify a `project-repositories.json` file for the commands that fetch comments and events.
+This is because events and comments are downloaded only for all issues that have been fetched with `python data.py fetch issues`.
+
 ## Importing data
 
 To import Stack Overflow posts from an XML file containing posts data, run:
