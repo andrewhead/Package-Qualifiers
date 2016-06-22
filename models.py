@@ -89,7 +89,7 @@ class Seed(ProxyModel):
     ''' An initial query given by a user for which autocomplete results are shown. '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     # Data about the query
@@ -102,7 +102,7 @@ class Query(ProxyModel):
     ''' An instance of a suggestion returned in response to a seed query. '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     # Data about the query
@@ -115,7 +115,7 @@ class Query(ProxyModel):
 class Search(ProxyModel):
     ''' A search query made to a search engine. '''
 
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     query = CharField()
@@ -184,7 +184,7 @@ class WebPageVersion(ProxyModel):
     '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     url = TextField(index=True)
@@ -210,7 +210,7 @@ class QuestionSnapshot(ProxyModel):
     '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     question_id = IntegerField(index=True)
@@ -388,7 +388,7 @@ class SnippetPattern(ProxyModel):
 
 class PostSnippet(ProxyModel):
     ''' A snippet of code found in a Stack Overflow post. '''
-    compute_index = IntegerField()
+    compute_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
     post = ForeignKeyField(Post)
     pattern = ForeignKeyField(SnippetPattern)
@@ -397,7 +397,7 @@ class PostSnippet(ProxyModel):
 
 class PostNpmInstallPackage(ProxyModel):
     ''' A package referenced in an 'npm install' command in a Stack Overflow post. '''
-    compute_index = IntegerField()
+    compute_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
     post = ForeignKeyField(Post)
     package = TextField()
@@ -405,7 +405,7 @@ class PostNpmInstallPackage(ProxyModel):
 
 class Task(ProxyModel):
     ''' A task that describes what you can do with a software package. '''
-    compute_index = IntegerField()
+    compute_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
     task = TextField(index=True)
     mode = TextField(index=True)
@@ -438,7 +438,7 @@ class GitHubProject(ProxyModel):
     ''' A project on GitHub. '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     # These identifiers identify the project from different contexts.
@@ -458,7 +458,7 @@ class Issue(ProxyModel):
     '''
 
     # Fetch logistics
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     github_id = IntegerField()
@@ -477,7 +477,7 @@ class Issue(ProxyModel):
 class IssueEvent(ProxyModel):
     ''' An event (e.g., "closed") for an issue for a GitHub project. '''
 
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     github_id = IntegerField()
@@ -489,7 +489,7 @@ class IssueEvent(ProxyModel):
 class IssueComment(ProxyModel):
     ''' A comment on a GitHub issue. '''
 
-    fetch_index = IntegerField()
+    fetch_index = IntegerField(index=True)
     date = DateTimeField(index=True, default=datetime.datetime.now)
 
     github_id = IntegerField()
