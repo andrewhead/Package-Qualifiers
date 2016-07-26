@@ -472,6 +472,7 @@ class Issue(ProxyModel):
     state = TextField()
     body = TextField(null=True)
     comments = IntegerField()
+    user_id = IntegerField(index=True, null=True, default=None)
 
 
 class IssueEvent(ProxyModel):
@@ -497,6 +498,7 @@ class IssueComment(ProxyModel):
     created_at = DateTimeField(index=True)
     updated_at = DateTimeField(index=True)
     body = TextField()
+    user_id = IntegerField(index=True, null=True, default=None)
 
 
 def init_database(db_type, config_filename=None):

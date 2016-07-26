@@ -113,6 +113,7 @@ def save_comments(comments, project, fetch_index, issue_fetch_index):
                 'created_at': comment['created_at'],
                 'updated_at': comment['updated_at'],
                 'body': comment['body'],
+                'user_id': comment['user']['id'],
             })
 
 

@@ -80,6 +80,7 @@ def save_issues(issues, project, fetch_index):
             state=issue['state'],
             body=issue['body'],
             comments=issue['comments'],
+            user_id=issue['user']['id'],
         )
 
 
