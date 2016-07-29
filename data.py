@@ -21,7 +21,7 @@ data_logger.propagate = False
 
 from models import create_tables, init_database
 from fetch import queries, results, results_content, histories, stack_overflow_questions, issues,\
-    issue_comments, issue_events
+    issue_comments, issue_events, slant_topics, slant_pros_and_cons
 from import_ import stackoverflow
 from compute import code, npm_packages, post_tags, python_snippets, tasks
 from migrate import run_migration
@@ -34,7 +34,7 @@ COMMANDS = {
         'module_help': "Type of data to fetch.",
         'modules': [
             histories, queries, results, results_content, stack_overflow_questions, issues,
-            issue_comments, issue_events,
+            issue_comments, issue_events, slant_topics, slant_pros_and_cons
         ],
     },
     'import': {

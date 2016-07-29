@@ -501,6 +501,48 @@ class IssueComment(ProxyModel):
     user_id = IntegerField(index=True, null=True, default=None)
 
 
+class SlantTopic(ProxyModel):
+    ''' A topic of discussion on the Slant website. '''
+
+    fetch_index = IntegerField(index=True)
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    topic_id = IntegerField(index=True)
+    title = TextField()
+    # For now, the endpoint we call only provides paths relative to an unnamed host,
+    # so this field only contains the path of the URL
+    url_path = TextField()
+    owner_username = TextField()
+
+
+class Viewpoint(ProxyModel):
+    ''' A "viewpoint" or alternative suggested in responts to a question on Slant. '''
+
+    fetch_index = IntegerField(index=True)
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    topic = ForeignKeyField(SlantTopic)
+    viewpoint_index = IntegerField()
+    title = TextField()
+    # Similarly to SlantTopic, only the URL path is provided, without domain
+    url_path = TextField()
+
+
+class ViewpointSection(ProxyModel):
+    ''' A pro / con section describing a viewpoint or alternative on Slant. '''
+
+    fetch_index = IntegerField(index=True)
+    date = DateTimeField(index=True, default=datetime.datetime.now)
+
+    viewpoint = ForeignKeyField(Viewpoint)
+    section_index = IntegerField()
+    title = TextField()
+    text = TextField()
+    is_con = BooleanField()
+    upvotes = IntegerField()
+    downvotes = IntegerField()
+
+
 def init_database(db_type, config_filename=None):
 
     if db_type == 'postgres':
@@ -560,4 +602,7 @@ def create_tables():
         Issue,
         IssueComment,
         IssueEvent,
+        SlantTopic,
+        Viewpoint,
+        ViewpointSection,
     ], safe=True)
