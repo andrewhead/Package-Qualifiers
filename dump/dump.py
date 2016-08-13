@@ -51,15 +51,31 @@ def dump_text(dest_basename):
     )
 
 
+def dump_csv(dest_basename, column_names, delimiter=','):
+    ''' Iterate over a generator function to dump the text lines it yields to a file. '''
+    return functools.partial(
+        _wrap_harvest_func_with_dump_func,
+        dump_func=functools.partial(
+            run_and_dump_csv,
+            column_names=column_names,
+            delimiter=delimiter,
+        ),
+        dest_basename=dest_basename,
+        file_extension='.csv',
+    )
+
+
 def _wrap_harvest_func_with_dump_func(harvest_func, dump_func, dest_basename, file_extension):
 
     @functools.wraps(harvest_func)
     def harvest_and_dump(*args, **kwargs):
 
         full_filename = dest_basename + '-' + time.strftime("%Y-%m-%d_%H:%M:%S") + file_extension
+        if not os.path.exists('data'):
+            os.makedirs('data')
         dump_path = os.path.join('data', full_filename)
 
-        with codecs.open(dump_path, 'w', encoding='utf8') as dump_file:
+        with codecs.open(dump_path, 'w', encoding='utf-8') as dump_file:
             dump_func(harvest_func, dump_file, *args, **kwargs)
 
     return harvest_and_dump
@@ -70,6 +86,30 @@ def run_and_dump_text(harvest_func, dump_file, *args, **kwargs):
     for line_list in harvest_func(*args, **kwargs):
         for line in line_list:
             dump_file.write(line + '\n')
+
+
+def run_and_dump_csv(harvest_func, dump_file, column_names, delimiter, *args, **kwargs):
+
+    def make_csv_line(record):
+        # Convert all elements of the record into good CSV:
+        # encapsulate all strings within double quotes, and
+        # convert all other data types to writable strings.
+        for index, item in enumerate(record):
+            if type(item) == str or type(item) == unicode:
+                escaped_string = item.replace('\r\n', "<newline>")
+                escaped_string = escaped_string.replace('\n', "<newline>")
+                record[index] = '"' + escaped_string + '"'
+            elif isinstance(item, datetime):
+                record[index] = item.isoformat()
+            else:
+                record[index] = str(item)
+        return delimiter.join(record) + '\n'
+
+    dump_file.write(make_csv_line(column_names))
+
+    for line_list in harvest_func(*args, **kwargs):
+        for line in line_list:
+            dump_file.write(make_csv_line(line))
 
 
 def run_and_dump_json(harvest_func, dump_file, *args, **kwargs):
