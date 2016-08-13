@@ -98,6 +98,7 @@ def run_and_dump_csv(harvest_func, dump_file, column_names, delimiter, *args, **
             if type(item) == str or type(item) == unicode:
                 escaped_string = item.replace('\r\n', "<newline>")
                 escaped_string = escaped_string.replace('\n', "<newline>")
+                escaped_string = escaped_string.replace('"', "<double-quote>")
                 record[index] = '"' + escaped_string + '"'
             elif isinstance(item, datetime):
                 record[index] = item.isoformat()

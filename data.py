@@ -25,7 +25,8 @@ from fetch import queries, results, results_content, histories, stack_overflow_q
 from import_ import stackoverflow
 from compute import code, npm_packages, post_tags, python_snippets, tasks
 from migrate import run_migration
-from dump import node_post_stats, package_top_queries, pattern_snippets, popular_tag_post_stats
+from dump import node_post_stats, package_top_queries, pattern_snippets, popular_tag_post_stats,\
+    slant_community_pros_and_cons
 
 
 COMMANDS = {
@@ -57,7 +58,10 @@ COMMANDS = {
     'dump': {
         'description': "Dump data to a JSON file.",
         'module_help': "Type of data to dump.",
-        'modules': [node_post_stats, pattern_snippets, package_top_queries, popular_tag_post_stats],
+        'modules': [
+            node_post_stats, pattern_snippets, package_top_queries, popular_tag_post_stats,
+            slant_community_pros_and_cons
+        ],
     },
 }
 
